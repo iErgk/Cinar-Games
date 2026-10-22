@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Çınar Games Racing</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#08121c;color:white;font-family:Arial;text-align:center}
+h1{color:#00ffc3;margin:12px}
+#score{font-size:22px;margin:10px}
+canvas{width:min(94vw,360px);height:auto;border:2px solid #00ffc3;border-radius:8px}
+button{padding:15px 25px;margin:8px;border:0;border-radius:12px;font-size:22px;font-weight:bold;background:#00ffc3;color:#07121b}
+#start{font-size:17px}
+</style>
+</head>
+<body>
+<h1>🏁 ÇINAR GAMES</h1>
+<div id="score">PUAN: 0</div>
+<canvas id="game" width="360" height="520"></canvas>
+<div>
+<button id="left">⬅️</button>
+<button id="right">➡️</button>
+</div>
+<button id="start">OYUNU BAŞLAT</button>
+<p id="msg">Rakip arabalardan kaç!</p>
+
+<script>
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+const scoreEl=document.getElementById("score");
+const msg=document.getElementById("msg");
+
+let player={x:156,y:410,w:48,h:76};
+let rivals=[],score=0,frame=0,running=false;
+let left=false,right=false;
+
+function drawCar(x,y,color){
+  ctx.fillStyle="#111";
+  ctx.fillRect(x-3,y+13,8,18);
+  ctx.fillRect(x+43,y+13,8,18);
+  ctx.fillRect(x-3,y+48,8,18);
+  ctx.fillRect(x+43,y+48,8,18);
+
+  let g=ctx.createLinearGradient(x,y,x+48,y);
+  g.addColorStop(0,"#222");
+  g.addColorStop(.4,color);
+  g.addColorStop(1,"#222");
+  ctx.fillStyle=g;
+  ctx.beginPath();
+  ctx.moveTo(x+12,y);
+  ctx.lineTo(x+36,y);
+  ctx.lineTo(x+47,y+18);
+  ctx.lineTo(x+44,y+65);
+  ctx.lineTo(x+36,y+76);
+  ctx.lineTo(x+12,y+76);
+  ctx.lineTo(x+4,y+65);
+  ctx.lineTo(x+1,y+18);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle="#8bdfff";
+  ctx.fillRect(x+12,y+16,24,18);
+  ctx.fillStyle="#ff334f";
+  ctx.fillRect(x+7,y+62,10,5);
+  ctx.fillRect(x+31,y+62,10,5);
+  ctx.fillStyle="#fff";
+  ctx.fillRect(x+7,y+5,9,4);
+  ctx.fillRect(x+32,y+5,9,4);
+}
+
+function drawRoad(){
+  ctx.fillStyle="#235c35";
+  ctx.fillRect(0,0,360,520);
+  ctx.fillStyle="#363c43";
+  ctx.fillRect(35,0,290,520);
+
+  ctx.fillStyle="#fff";
+  ctx.fillRect(35,0,4,520);
+  ctx.fillRect(321,0,4,520);
+
+  for(let y=(frame*6)%80-80;y<520;y+=80){
+    ctx.fillRect(105,y,5,40);
+    ctx.fillRect(250,y,5,40);
+  }
+}
+
+function endGame(){
+  running=false;
+  msg.textContent="🏁 Oyun bitti! Puanın: "+score;
+  document.getElementById("start").textContent="TEKRAR OYNA";
+}
+
+function loop(){
+  if(!running)return;
+  frame++;
+  drawRoad();
+
+  if(left)player.x-=5;
+  if(right)player.x+=5;
+  player.x=Math.max(43,Math.min(269,player.x));
+
+  if(frame%55===0){
+    const lanes=[48,120,194,264];
+    const x=lanes[Math.floor(Math.random()*lanes.length)];
+    const colors=["#ff3030","#ffbf27","#a45bff","#eeeeee"];
+    rivals.push({
+      x:x,y:-80,
+      color:colors[Math.floor(Math.random()*colors.length)]
+    });
+  }
+
+  for(const r of rivals){
+    r.y+=5;
+    drawCar(r.x,r.y,r.color);
+
+    if(player.x<r.x+48&&player.x+48>r.x&&
+       player.y<r.y+76&&player.y+76>r.y){
+      endGame();
+      return;
+    }
+  }
+
+  rivals=rivals.filter(r=>r.y<530);
+  drawCar(player.x,player.y,"#078dff");
+
+  if(frame%8===0){
+    score++;
+    scoreEl.textContent="PUAN: "+score;
+  }
+
+  requestAnimationFrame(loop);
+}
+
+function startGame(){
+  player.x=156;
+  rivals=[];
+  score=0;
+  frame=0;
+  running=true;
+  scoreEl.textContent="PUAN: 0";
+  msg.textContent="Rakiplerden kaç!";
+  document.getElementById("start").textContent="YENİDEN BAŞLAT";
+  loop();
+}
+
+function control(id,change){
+  const b=document.getElementById(id);
+  b.addEventListener("pointerdown",e=>{
+    e.preventDefault();
+    change(true);
+  });
+  ["pointerup","pointercancel","pointerleave"].forEach(ev=>{
+    b.addEventListener(ev,()=>change(false));
+  });
+}
+
+control("left",v=>left=v);
+control("right",v=>right=v);
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="ArrowLeft")left=true;
+  if(e.key==="ArrowRight")right=true;
+});
+document.addEventListener("keyup",e=>{
+  if(e.key==="ArrowLeft")left=false;
+  if(e.key==="ArrowRight")right=false;
+});
+
+document.getElementById("start").addEventListener("click",startGame);
+
+drawRoad();
+drawCar(player.x,player.y,"#078dff");
+</script>
+</body>
+</html>
