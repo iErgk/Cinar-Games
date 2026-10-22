@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html>
+
+<html lang="tr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<title>Çınar Racing</title>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{margin:0;background:#101820;color:white;font-family:Arial;text-align:center;touch-action:manipulation}
+
+h2{color:#00ff99;margin:12px}
+
+#info{display:flex;justify-content:space-around;padding:8px;font-weight:bold}
+
+canvas{width:min(100vw,400px);height:auto;display:block;margin:auto;border:2px solid #777}
+
+.controls{display:flex;justify-content:center;gap:35px;margin:12px}
+
+button{font-size:22px;font-weight:bold;padding:16px 28px;border:0;border-radius:14px;background:#00e699;color:#111;touch-action:none}
+
+#start{font-size:18px;margin-bottom:12px}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>🏁 ÇINAR RACING</h2>
+
+<div id="info"><span>🏆 Puan: <b id="score">0</b></span><span>⚡ Hız: <b id="speed">1</b></span></div>
+
+<canvas id="game" width="360" height="540"></canvas>
+
+<div class="controls">
+
+<button id="left">⬅️ SOL</button>
+
+<button id="right">SAĞ ➡️</button>
+
+</div>
+
+<button id="start">OYUNU BAŞLAT</button>
+
+<script>
+
+const c=document.getElementById("game"),ctx=c.getContext("2d");
+
+let p={x:158,y:430},enemies=[],score=0,speed=3,lines=0;
+
+let running=false,ended=false,left=false,right=false,last=0,spawn=0;
+
+function car(x,y,color){
+
+ ctx.fillStyle="#111";
+
+ ctx.fillRect(x,y+15,8,18);ctx.fillRect(x+36,y+15,8,18);
+
+ ctx.fillRect(x,y+48,8,18);ctx.fillRect(x+36,y+48,8,18);
+
+ ctx.fillStyle=color;ctx.fillRect(x+5,y+8,34,57);
+
+ ctx.fillStyle="#a9f5ff";ctx.fillRect(x+10,y+14,24,13);
+
+ ctx.fillStyle="#fff4a0";ctx.fillRect(x+9,y+55,8,5);ctx.fillRect(x+27,y+55,8,5);
+
+}
+
+function draw(){
+
+ ctx.fillStyle="#247039";ctx.fillRect(0,0,360,540);
+
+ ctx.fillStyle="#444";ctx.fillRect(35,0,290,540);
+
+ ctx.fillStyle="white";
+
+ for(let y=-50;y<550;y+=90){
+
+  ctx.fillRect(177,y+lines,6,45);
+
+  ctx.fillRect(39,y+lines,4,45);ctx.fillRect(317,y+lines,4,45);
+
+ }
+
+ car(p.x,p.y,"#00d9ff");
+
+ enemies.forEach(e=>car(e.x,e.y,e.color));
+
+ if(!running){
+
+  ctx.fillStyle="rgba(0,0,0,.75)";ctx.fillRect(35,205,290,100);
+
+  ctx.fillStyle="#fff";ctx.textAlign="center";
+
+  ctx.font="bold 23px Arial";ctx.fillText(ended?"ÇARPIŞTIN!":"ÇINAR RACING",180,245);
+
+  ctx.font="16px Arial";ctx.fillText(ended?"Tekrar başlat ve yarış!":"Hazır mısın yarışçı?",180,278);
+
+ }
+
+}
+
+function reset(){
+
+ p.x=158;enemies=[];score=0;speed=3;lines=0;spawn=0;
+
+ running=true;ended=false;last=0;
+
+ document.getElementById("score").textContent="0";
+
+ document.getElementById("speed").textContent="1";
+
+ requestAnimationFrame(loop);
+
+}
+
+function loop(t){
+
+ if(!running)return;
+
+ if(!last)last=t;
+
+ let dt=Math.min((t-last)/16.67,2);last=t;
+
+ if(left)p.x-=5*dt;if(right)p.x+=5*dt;
+
+ p.x=Math.max(42,Math.min(274,p.x));
+
+ lines=(lines+speed*dt)%90;spawn+=dt;
+
+ if(spawn>Math.max(25,65-score/15)){
+
+  spawn=0;
+
+  enemies.push({x:[52,112,162,212,264][Math.floor(Math.random()*5)],y:-80,color:["#ff4545","#ffb52e","#bb66ff"][Math.floor(Math.random()*3)]});
+
+ }
+
+ enemies.forEach(e=>e.y+=speed*dt);
+
+ enemies=enemies.filter(e=>{
+
+  if(e.y>550){score++;return false}
+
+  if(p.x<e.x+39&&p.x+44>e.x+5&&p.y<e.y+65&&p.y+65>e.y+8){
+
+   running=false;ended=true;
+
+  }
+
+  return true;
+
+ });
+
+ document.getElementById("score").textContent=score;
+
+ speed=3+Math.min(score/10,7);
+
+ document.getElementById("speed").textContent=Math.floor(speed/3);
+
+ draw();if(running)requestAnimationFrame(loop);
+
+}
+
+function hold(id,side){
+
+ const b=document.getElementById(id);
+
+ b.addEventListener("pointerdown",e=>{e.preventDefault();if(side==="L")left=true;else right=true});
+
+ ["pointerup","pointercancel","pointerleave"].forEach(ev=>b.addEventListener(ev,()=>{if(side==="L")left=false;else right=false}));
+
+}
+
+hold("left","L");hold("right","R");
+
+document.getElementById("start").onclick=reset;
+
+document.addEventListener("keydown",e=>{
+
+ if(e.key==="ArrowLeft")left=true;
+
+ if(e.key==="ArrowRight")right=true;
+
+});
+
+document.addEventListener("keyup",e=>{
+
+ if(e.key==="ArrowLeft")left=false;
+
+ if(e.key==="ArrowRight")right=false;
+
+});
+
+draw();
+
+</script>
+
+</body>
+
+</html>
