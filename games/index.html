@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Çınar Racing V3</title>
+<style>
+*{box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101820;color:white;font-family:Arial;touch-action:manipulation}
+#top{height:48px;display:flex;align-items:center;justify-content:space-around;background:#172554;font-weight:bold}
+#road{display:block;width:100%;height:calc(100dvh - 150px);touch-action:none}
+#controls{height:102px;display:flex;justify-content:space-around;align-items:center;gap:18px;padding:8px 18px}
+.control{flex:1;max-width:180px;height:78px;border:0;border-radius:18px;background:#7547ff;color:white;font-size:36px;font-weight:bold;touch-action:none;-webkit-tap-highlight-color:transparent}
+#home{position:fixed;top:6px;left:6px;z-index:2;border:0;border-radius:8px;padding:7px;background:#343e60;color:white}
+</style>
+</head>
+<body>
+<button id="home" onclick="location.href='../index.html'">⌂ Ana Menü</button>
+<div id="top"><span>🏁 ÇINAR RACING</span><span>Puan: <b id="score">0</b></span></div>
+<canvas id="road"></canvas>
+<div id="controls">
+<button class="control" id="left">⬅️</button>
+<button class="control" id="right">➡️</button>
+</div>
+<script>
+const canvas=document.getElementById('road');
+const ctx=canvas.getContext('2d');
+const scoreText=document.getElementById('score');
+let w=0,h=0,carX=0,score=0,lines=0,over=false;
+let left=false,right=false,enemies=[],lastSpawn=0;
+const roadL=()=>w*.15;
+const roadW=()=>w*.7;
+
+function resize(){
+ const r=canvas.getBoundingClientRect();
+ const d=Math.min(devicePixelRatio||1,2);
+ canvas.width=Math.floor(r.width*d);
+ canvas.height=Math.floor(r.height*d);
+ ctx.setTransform(d,0,0,d,0,0);
+ w=r.width;h=r.height;
+ if(!carX)carX=w/2;
+ carX=Math.max(roadL()+20,Math.min(roadL()+roadW()-20,carX));
+}
+addEventListener('resize',resize);
+resize();
+
+function hold(id,side){
+ const el=document.getElementById(id);
+ const down=e=>{
+  e.preventDefault();
+  if(side==='left')left=true;else right=true;
+  try{el.setPointerCapture(e.pointerId)}catch(_){}
+ };
+ const up=e=>{
+  e.preventDefault();
+  if(side==='left')left=false;else right=false;
+ };
+ el.addEventListener('pointerdown',down);
+ ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,up));
+ el.addEventListener('contextmenu',e=>e.preventDefault());
+}
+hold('left','left');hold('right','right');
+
+function car(x,y,color,player=false){
+ ctx.fillStyle='#111';
+ ctx.fillRect(x-17,y+12,7,18);ctx.fillRect(x+10,y+12,7,18);
+ ctx.fillStyle=color;
+ ctx.beginPath();ctx.roundRect(x-14,y,28,48,6);ctx.fill();
+ ctx.fillStyle='#bdeaff';ctx.fillRect(x-9,y+8,18,11);
+ ctx.fillStyle='#222';ctx.fillRect(x-9,y+30,18,8);
+ if(player){ctx.fillStyle='#fff36b';ctx.fillRect(x-10,y+2,6,4);ctx.fillRect(x+4,y+2,6,4)}
+}
+function spawn(){
+ const lane=Math.floor(Math.random()*3);
+ enemies.push({x:roadL()+roadW()*(lane+.5)/3,y:-55});
+}
+function draw(){
+ ctx.clearRect(0,0,w,h);
+ ctx.fillStyle='#26743c';ctx.fillRect(0,0,w,h);
+ ctx.fillStyle='#41444a';ctx.fillRect(roadL(),0,roadW(),h);
+ ctx.fillStyle='white';
+ ctx.fillRect(roadL()+4,0,4,h);ctx.fillRect(roadL()+roadW()-8,0,4,h);
+ lines=(lines+4)%50;
+ for(let y=lines-50;y<h;y+=50){
+  ctx.fillRect(w/2-3,y,6,27);
+ }
+ if(!over){
+  if(left)carX-=5;
+  if(right)carX+=5;
+  carX=Math.max(roadL()+23,Math.min(roadL()+roadW()-23,carX));
+  if(performance.now()-lastSpawn>1000){
+   spawn();lastSpawn=performance.now();
+  }
+  for(let i=enemies.length-1;i>=0;i--){
+   const e=enemies[i];e.y+=4;
+   car(e.x,e.y,'#ef4444');
+   if(e.y>h){
+    enemies.splice(i,1);score+=10;scoreText.textContent=score;
+   }else if(e.y+44>h-65&&e.y<h-15&&Math.abs(e.x-carX)<27){
+    over=true;left=false;right=false;
+   }
+  }
+ }
+ car(carX,h-65,'#31a8ff',true);
+ if(over){
+  ctx.fillStyle='rgba(0,0,0,.8)';ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='white';ctx.textAlign='center';
+  ctx.font='bold 28px Arial';ctx.fillText('OYUN BİTTİ',w/2,h/2-20);
+  ctx.font='18px Arial';ctx.fillText('Puan: '+score,w/2,h/2+15);
+  ctx.fillText('Tekrar başlamak için dokun',w/2,h/2+48);
+ }
+}
+canvas.addEventListener('pointerdown',()=>{
+ if(over){
+  score=0;scoreText.textContent='0';enemies=[];over=false;carX=w/2;
+ }
+});
+function loop(){draw();requestAnimationFrame(loop)}
+loop();
+</script>
+</body>
+</html>
