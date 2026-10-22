@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Çınar Games Racing</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#08121c;color:white;font-family:Arial;text-align:center}
+h1{color:#00ffc3;margin:14px}
+#score{font-size:22px;margin:12px}
+canvas{width:min(94vw,360px);height:auto;border:2px solid #00ffc3;border-radius:8px}
+button{padding:15px 25px;margin:8px;border:0;border-radius:12px;font-size:22px;font-weight:bold;background:#00ffc3;color:#07121b}
+#start{font-size:17px}
+</style>
+</head>
+<body>
+<h1>🏁 ÇINAR GAMES</h1>
+<div id="score">PUAN: 0</div>
+<canvas id="game" width="360" height="520"></canvas>
+<div>
+<button id="left">⬅️</button>
+<button id="right">➡️</button>
+</div>
+<button id="start">OYUNU BAŞLAT</button>
+<p id="msg">Rakip arabalardan kaç!</p>
+
+<script>
+const c=document.getElementById("game");
+const ctx=c.getContext("2d");
+const scoreEl=document.getElementById("score");
+const msg=document.getElementById("msg");
+let player={x:156,y:410};
+let rivals=[],score=0,frame=0,running=false;
+let left=false,right=false;
+
+function car(x,y,color){
+  ctx.fillStyle="#101318";
+  ctx.fillRect(x-3,y+14,9,19);
+  ctx.fillRect(x+42,y+14,9,19);
+  ctx.fillRect(x-3,y+48,9,19);
+  ctx.fillRect(x+42,y+48,9,19);
+
+  let g=ctx.createLinearGradient(x,y,x+48,y);
+  g.addColorStop(0,"#202630");
+  g.addColorStop(.4,color);
+  g.addColorStop(1,"#171b23");
+  ctx.fillStyle=g;
+  ctx.beginPath();
+  ctx.moveTo(x+12,y);
+  ctx.lineTo(x+36,y);
+  ctx.lineTo(x+47,y+18);
+  ctx.lineTo(x+44,y+65);
+  ctx.lineTo(x+35,y+76);
+  ctx.lineTo(x+13,y+76);
+  ctx.lineTo(x+4,y+65);
+  ctx.lineTo(x+1,y+18);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle="#8bdfff";
+  ctx.fillRect(x+12,y+15,24,19);
+  ctx.fillStyle="#ff304e";
+  ctx.fillRect(x+7,y+62,10,5);
+  ctx.fillRect(x+31,y+62,10,5);
+  ctx.fillStyle="#fff";
+  ctx.fillRect(x+7,y+5,9,4);
+  ctx.fillRect(x+32,y+5,9,4);
+}
+
+function road(){
+  ctx.fillStyle="#245d36";
+  ctx
