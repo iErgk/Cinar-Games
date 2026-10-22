@@ -1,52 +1,83 @@
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Çınar Games</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Çınar Racing V3</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#0b1020;color:white;font-family:Arial,sans-serif}
-header{padding:28px 16px;text-align:center;background:linear-gradient(135deg,#141e46,#6424a8)}
-h1{margin:0;font-size:36px}
-header p{color:#ddd}
-main{max-width:900px;margin:25px auto;padding:15px}
-h2{color:#9b8cff}
-.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.card{background:#171e33;border:1px solid #303957;border-radius:16px;padding:20px;text-align:center}
-.car{font-size:65px}
-button{background:#7c4dff;color:white;border:0;border-radius:10px;padding:12px 20px;font-size:16px;cursor:pointer}
-button:hover{background:#6035d9}
-footer{text-align:center;color:#aaa;padding:30px}
+body{margin:0;background:#101522;color:white;font-family:Arial;text-align:center}
+h2{margin:12px}
+#score{padding:8px;font-size:20px}
+canvas{width:min(94vw,400px);height:auto;border:2px solid white;display:block;margin:auto;background:#267a39;touch-action:manipulation}
+.controls{display:flex;justify-content:center;gap:12px;margin:12px}
+button{font-size:22px;padding:14px 20px;border:0;border-radius:12px;background:#7048ff;color:white}
+#start{font-size:16px}
 </style>
 </head>
 <body>
-<header>
-<h1>🎮 ÇINAR GAMES</h1>
-<p>Kendi oyun dünyama hoş geldin!</p>
-</header>
-<main>
-<h2>🎯 Oyunlarım</h2>
-<div class="games">
-<div class="card">
-<div class="car">🏎️</div>
-<h3>Araba Yarışı</h3>
-<p>Rakiplerden kaç, puanları topla!</p>
-<button onclick="location.href='games/'">OYNA</button>
+<h2>🏁 ÇINAR RACING V3</h2>
+<div id="score">Puan: 0</div>
+<canvas id="c" width="400" height="600"></canvas>
+<div class="controls">
+<button id="l">⬅️</button>
+<button id="start">BAŞLAT</button>
+<button id="r">➡️</button>
 </div>
-<div class="card">
-<div style="font-size:65px">🧟</div>
-<h3>Zombi Dünyası</h3>
-<p>Yakında burada!</p>
-<button onclick="alert('Bu oyun yakında!')">YAKINDA</button>
-</div>
-<div class="card">
-<div style="font-size:65px">🌍</div>
-<h3>Açık Dünya</h3>
-<p>Yeni maceralar yakında!</p>
-<button onclick="alert('Bu oyun yakında!')">YAKINDA</button>
-</div>
-</div>
-</main>
-<footer>© 2026 Çınar Games | Kendi oyununu kendin yap!</footer>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');
+let px=180, enemies=[],score=0,playing=false,road=0,last=0,spawn=0;
+function car(a,b,color){
+ x.fillStyle='#111';
+ x.fillRect(a-4,b+12,8,17);x.fillRect(a+36,b+12,8,17);
+ x.fillRect(a-4,b+48,8,17);x.fillRect(a+36,b+48,8,17);
+ x.fillStyle=color;x.fillRect(a,b,40,75);
+ x.fillStyle='#9de7ff';x.fillRect(a+6,b+9,28,18);
+ x.fillStyle='#222';x.fillRect(a+6,b+38,28,20);
+ x.fillStyle='white';x.fillRect(a+5,b+65,8,5);x.fillRect(a+27,b+65,8,5);
+}
+function draw(){
+ x.fillStyle='#267a39';x.fillRect(0,0,400,600);
+ x.fillStyle='#444';x.fillRect(45,0,310,600);
+ x.fillStyle='white';x.fillRect(48,0,5,600);x.fillRect(347,0,5,600);
+ for(let y=-60+(road%80);y<600;y+=80){
+ x.fillRect(145,y,7,40);x.fillRect(248,y,7,40);
+ }
+ enemies.forEach(e=>car(e.x,e.y,e.color));
+ car(px,490,'#f22c45');
+}
+function finish(){
+ playing=false;draw();
+ x.fillStyle='rgba(0,0,0,.8)';x.fillRect(40,220,320,130);
+ x.fillStyle='white';x.textAlign='center';
+ x.font='bold 28px Arial';x.fillText('OYUN BİTTİ',200,265);
+ x.font='20px Arial';x.fillText('Puan: '+score,200,305);
+}
+function loop(t){
+ if(!playing)return;
+ let dt=Math.min((t-last)/16.67||1,2);last=t;
+ road+=5*dt;spawn+=dt;
+ if(spawn>45){
+ spawn=0;
+ enemies.push({x:[75,180,285][Math.floor(Math.random()*3)],y:-80,color:['#38a5ff','#ffbd2e','#b34cff'][Math.floor(Math.random()*3)]});
+ }
+ enemies.forEach(e=>e.y+=5*dt);
+ enemies=enemies.filter(e=>e.y<620);
+ for(const e of enemies){
+ if(px<e.x+36&&px+40>e.x+4&&490<e.y+70&&565>e.y+5){finish();return;}
+ }
+ score+=Math.floor(dt);
+ document.getElementById('score').textContent='Puan: '+score;
+ draw();requestAnimationFrame(loop);
+}
+function move(n){if(playing){px=Math.max(58,Math.min(302,px+n*35));draw()}}
+document.getElementById('l').onclick=()=>move(-1);
+document.getElementById('r').onclick=()=>move(1);
+document.getElementById('start').onclick=()=>{
+ px=180;score=0;enemies=[];road=0;spawn=0;last=0;playing=true;
+ document.getElementById('score').textContent='Puan: 0';
+ draw();requestAnimationFrame(loop);
+};
+draw();
+</script>
 </body>
-</html></escape>
+</html>
