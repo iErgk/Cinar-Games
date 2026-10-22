@@ -1,73 +1,52 @@
-<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Çınar Games Racing</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Çınar Games</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#08121c;color:white;font-family:Arial;text-align:center}
-h1{color:#00ffc3;margin:14px}
-#score{font-size:22px;margin:12px}
-canvas{width:min(94vw,360px);height:auto;border:2px solid #00ffc3;border-radius:8px}
-button{padding:15px 25px;margin:8px;border:0;border-radius:12px;font-size:22px;font-weight:bold;background:#00ffc3;color:#07121b}
-#start{font-size:17px}
+body{margin:0;background:#0b1020;color:white;font-family:Arial,sans-serif}
+header{padding:28px 16px;text-align:center;background:linear-gradient(135deg,#141e46,#6424a8)}
+h1{margin:0;font-size:36px}
+header p{color:#ddd}
+main{max-width:900px;margin:25px auto;padding:15px}
+h2{color:#9b8cff}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:#171e33;border:1px solid #303957;border-radius:16px;padding:20px;text-align:center}
+.car{font-size:65px}
+button{background:#7c4dff;color:white;border:0;border-radius:10px;padding:12px 20px;font-size:16px;cursor:pointer}
+button:hover{background:#6035d9}
+footer{text-align:center;color:#aaa;padding:30px}
 </style>
 </head>
 <body>
-<h1>🏁 ÇINAR GAMES</h1>
-<div id="score">PUAN: 0</div>
-<canvas id="game" width="360" height="520"></canvas>
-<div>
-<button id="left">⬅️</button>
-<button id="right">➡️</button>
+<header>
+<h1>🎮 ÇINAR GAMES</h1>
+<p>Kendi oyun dünyama hoş geldin!</p>
+</header>
+<main>
+<h2>🎯 Oyunlarım</h2>
+<div class="games">
+<div class="card">
+<div class="car">🏎️</div>
+<h3>Araba Yarışı</h3>
+<p>Rakiplerden kaç, puanları topla!</p>
+<button onclick="location.href='games/'">OYNA</button>
 </div>
-<button id="start">OYUNU BAŞLAT</button>
-<p id="msg">Rakip arabalardan kaç!</p>
-
-<script>
-const c=document.getElementById("game");
-const ctx=c.getContext("2d");
-const scoreEl=document.getElementById("score");
-const msg=document.getElementById("msg");
-let player={x:156,y:410};
-let rivals=[],score=0,frame=0,running=false;
-let left=false,right=false;
-
-function car(x,y,color){
-  ctx.fillStyle="#101318";
-  ctx.fillRect(x-3,y+14,9,19);
-  ctx.fillRect(x+42,y+14,9,19);
-  ctx.fillRect(x-3,y+48,9,19);
-  ctx.fillRect(x+42,y+48,9,19);
-
-  let g=ctx.createLinearGradient(x,y,x+48,y);
-  g.addColorStop(0,"#202630");
-  g.addColorStop(.4,color);
-  g.addColorStop(1,"#171b23");
-  ctx.fillStyle=g;
-  ctx.beginPath();
-  ctx.moveTo(x+12,y);
-  ctx.lineTo(x+36,y);
-  ctx.lineTo(x+47,y+18);
-  ctx.lineTo(x+44,y+65);
-  ctx.lineTo(x+35,y+76);
-  ctx.lineTo(x+13,y+76);
-  ctx.lineTo(x+4,y+65);
-  ctx.lineTo(x+1,y+18);
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.fillStyle="#8bdfff";
-  ctx.fillRect(x+12,y+15,24,19);
-  ctx.fillStyle="#ff304e";
-  ctx.fillRect(x+7,y+62,10,5);
-  ctx.fillRect(x+31,y+62,10,5);
-  ctx.fillStyle="#fff";
-  ctx.fillRect(x+7,y+5,9,4);
-  ctx.fillRect(x+32,y+5,9,4);
-}
-
-function road(){
-  ctx.fillStyle="#245d36";
-  ctx
+<div class="card">
+<div style="font-size:65px">🧟</div>
+<h3>Zombi Dünyası</h3>
+<p>Yakında burada!</p>
+<button onclick="alert('Bu oyun yakında!')">YAKINDA</button>
+</div>
+<div class="card">
+<div style="font-size:65px">🌍</div>
+<h3>Açık Dünya</h3>
+<p>Yeni maceralar yakında!</p>
+<button onclick="alert('Bu oyun yakında!')">YAKINDA</button>
+</div>
+</div>
+</main>
+<footer>© 2026 Çınar Games | Kendi oyununu kendin yap!</footer>
+</body>
+</html></escape>
