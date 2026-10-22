@@ -3,156 +3,154 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Çınar Games - Yarış</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Çınar Racing</title>
 <style>
-*{box-sizing:border-box;touch-action:manipulation}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#151515;color:white;font-family:Arial;overscroll-behavior:none}
-body{user-select:none;-webkit-user-select:none}
-header{height:48px;display:flex;justify-content:space-around;align-items:center;background:#111;font-weight:bold}
-canvas{display:block;width:100%;height:calc(100% - 150px);background:#287d36}
-#controls{height:102px;display:flex;gap:14px;justify-content:center;align-items:center;background:#202020}
-button{border:0;border-radius:18px;background:#ffb000;color:#111;font-weight:bold;font-size:23px;min-width:110px;height:68px;touch-action:none;-webkit-user-select:none}
-#message{position:fixed;display:none;inset:25% 8% auto;background:#111e;padding:24px;border:2px solid gold;border-radius:20px;text-align:center}
-#message button{font-size:18px;height:50px;margin-top:12px}
+*{box-sizing:border-box}
+body{margin:0;background:#080b14;color:white;font-family:Arial,sans-serif;text-align:center;overflow:hidden;touch-action:manipulation}
+header{padding:10px;background:#11172a;border-bottom:2px solid #00eaff}
+h1{margin:4px;color:#00eaff;text-shadow:0 0 15px #00eaff}
+#stats{display:flex;justify-content:space-around;padding:8px;font-weight:bold}
+#game{position:relative;margin:auto;width:min(100vw,420px);height:62vh;min-height:330px;max-height:570px;overflow:hidden;background:#252d37;border:3px solid #536477;border-radius:12px}
+canvas{width:100%;height:100%;display:block}
+#overlay{position:absolute;inset:0;background:#050913d9;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px}
+#overlay h2{font-size:30px;color:#00eaff}
+button{border:0;border-radius:12px;padding:15px 22px;font-size:19px;font-weight:bold;background:#00ddeb;color:#06121a;touch-action:none}
+#controls{display:flex;gap:35px;justify-content:center;margin:12px}
+#controls button{width:125px;font-size:28px;background:#713cff;color:white;box-shadow:0 0 15px #713cff}
+small{color:#b8c5d8}
+a{color:#00eaff}
 </style>
 </head>
 <body>
-<header>
- <span>🏁 ÇINAR RACE</span>
- <span>🏆 <b id="score">0</b></span>
- <span>⭐ Rekor: <b id="best">0</b></span>
-</header>
-<canvas id="game"></canvas>
+<header><h1>🏁 ÇINAR RACING</h1><small>Yarışa hazır mısın?</small></header>
+<div id="stats">
+<span>🏆 Puan: <b id="score">0</b></span>
+<span>⭐ Rekor: <b id="best">0</b></span>
+</div>
+<div id="game">
+<canvas id="road"></canvas>
+<div id="overlay">
+<h2>🏎️ ÇINAR RACING</h2>
+<p>Rakip araçlardan kaç, rekorunu kır!</p>
+<button id="start">YARIŞI BAŞLAT</button>
+<p><small>Aracı kontrol etmek için sağ ve sol tuşlarını basılı tut.</small></p>
+</div>
+</div>
 <div id="controls">
- <button id="left">⬅ SOL</button>
- <button id="right">SAĞ ➡</button>
+<button id="left">⬅️ SOL</button>
+<button id="right">SAĞ ➡️</button>
 </div>
-<div id="message">
- <h2 id="result">🏆 OYUN BİTTİ!</h2>
- <p id="final"></p>
- <button id="restart">🔄 TEKRAR OYNA</button>
-</div>
+<p><a href="../index.html">← Ana sayfaya dön</a></p>
 <script>
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
-const scoreEl=document.getElementById('score'),bestEl=document.getElementById('best');
-let W=0,H=0,playerX=0,traffic=[],score=0,best=Number(localStorage.getItem('cinarRaceBest')||0);
-let running=true,left=false,right=false,roadOffset=0,last=0,spawn=0,speed=4;
+const canvas=document.getElementById('road'),ctx=canvas.getContext('2d');
+const game=document.getElementById('game');
+const scoreEl=document.getElementById('score');
+const bestEl=document.getElementById('best');
+const overlay=document.getElementById('overlay');
+let W=420,H=500,player,traffic=[],score=0,best=Number(localStorage.getItem('cinarRacingBest')||0);
+let running=false,left=false,right=false,last=0,spawn=0,roadMove=0,speed=4,audio;
 bestEl.textContent=best;
 
 function resize(){
- const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);
- W=r.width;H=r.height;canvas.width=W*d;canvas.height=H*d;
- ctx.setTransform(d,0,0,d,0,0);
- playerX=Math.max(24,Math.min(W-24,playerX||W/2));
+ const r=game.getBoundingClientRect();
+ W=canvas.width=Math.floor(r.width);
+ H=canvas.height=Math.floor(r.height);
+ if(!player)player={x:W/2-18,y:H-100,w:36,h:62};
+ player.y=H-100;
+ player.x=Math.max(12,Math.min(W-48,player.x));
+ draw();
 }
-addEventListener('resize',resize);resize();
-function car(x,y,w,h,color){
- ctx.fillStyle='#111';ctx.fillRect(x-w*.58,y+h*.18,w*.18,h*.25);
- ctx.fillRect(x+w*.4,y+h*.18,w*.18,h*.25);
- ctx.fillRect(x-w*.58,y+h*.65,w*.18,h*.25);
- ctx.fillRect(x+w*.4,y+h*.65,w*.18,h*.25);
- ctx.fillStyle=color;ctx.fillRect(x-w/2,y,w,h);
- ctx.fillStyle='#9ce7ff';ctx.fillRect(x-w*.32,y+h*.18,w*.64,h*.25);
- ctx.fillStyle='#222';ctx.fillRect(x-w*.32,y+h*.52,w*.64,h*.23);
- ctx.fillStyle='#fff6a0';ctx.fillRect(x-w*.4,y+h*.05,w*.2,h*.08);
- ctx.fillRect(x+w*.2,y+h*.05,w*.2,h*.08);
+window.addEventListener('resize',resize);
+function beep(freq=440,dur=.12,type='sine'){
+ try{
+  audio=audio||new (window.AudioContext||window.webkitAudioContext)();
+  if(audio.state==='suspended')audio.resume();
+  const o=audio.createOscillator(),g=audio.createGain();
+  o.type=type;o.frequency.value=freq;g.gain.value=.07;
+  o.connect(g);g.connect(audio.destination);o.start();
+  g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);
+  o.stop(audio.currentTime+dur);
+ }catch(e){}
+}
+function car(x,y,w,h,color,playerCar=false){
+ ctx.fillStyle='#0007';ctx.fillRect(x+3,y+5,w,h);
+ ctx.fillStyle='#111';ctx.fillRect(x-3,y+9,6,15);ctx.fillRect(x+w-3,y+9,6,15);
+ ctx.fillRect(x-3,y+h-23,6,15);ctx.fillRect(x+w-3,y+h-23,6,15);
+ ctx.fillStyle=color;ctx.fillRect(x,y,w,h);
+ ctx.fillStyle=playerCar?'#9efaff':'#dce8f2';
+ ctx.fillRect(x+6,y+9,w-12,15);
+ ctx.fillStyle='#182536';ctx.fillRect(x+6,y+29,w-12,15);
+ ctx.fillStyle='#fff6b0';ctx.fillRect(x+4,y+2,7,5);ctx.fillRect(x+w-11,y+2,7,5);
+ ctx.fillStyle='#ff3333';ctx.fillRect(x+4,y+h-6,7,4);ctx.fillRect(x+w-11,y+h-6,7,4);
 }
 function draw(){
+ if(!W||!H)return;
  ctx.clearRect(0,0,W,H);
- ctx.fillStyle='#287d36';ctx.fillRect(0,0,W,H);
- const rw=Math.min(W*.78,430),rx=(W-rw)/2;
- ctx.fillStyle='#555';ctx.fillRect(rx,0,rw,H);
- ctx.fillStyle='#eee';ctx.fillRect(rx+5,0,4,H);ctx.fillRect(rx+rw-9,0,4,H);
- ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.setLineDash([30,24]);
- ctx.lineDashOffset=-roadOffset;
- ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();ctx.setLineDash([]);
- for(let y=-20;y<H;y+=70){
-  let yy=(y+roadOffset*2)%(H+70);
-  ctx.fillStyle='#145d26';ctx.beginPath();ctx.arc(rx-20,yy,9,0,7);ctx.fill();
-  ctx.beginPath();ctx.arc(rx+rw+20,yy,9,0,7);ctx.fill();
+ ctx.fillStyle='#17612e';ctx.fillRect(0,0,W,H);
+ const rw=W*.76,rx=(W-rw)/2;
+ ctx.fillStyle='#343a44';ctx.fillRect(rx,0,rw,H);
+ ctx.fillStyle='#f2f2f2';ctx.fillRect(rx+5,0,4,H);ctx.fillRect(rx+rw-9,0,4,H);
+ ctx.fillStyle='#f6e65b';
+ for(let y=-50+(roadMove%70);y<H;y+=70){
+  ctx.fillRect(W/2-3,y,6,38);
+  ctx.fillRect(W*.38-2,y,4,38);
+  ctx.fillRect(W*.62-2,y,4,38);
  }
- const cw=Math.max(29,Math.min(42,rw*.12)),ch=cw*1.65;
- traffic.forEach(t=>car(t.x,t.y,cw,ch,t.color));
- car(playerX,H-ch-12,cw,ch,'#ff3030');
+ traffic.forEach(t=>car(t.x,t.y,t.w,t.h,t.color));
+ if(player)car(player.x,player.y,player.w,player.h,'#00cfff',true);
 }
-let audio=null,engineOsc=null,engineGain=null;
-function initAudio(){
- if(audio){if(audio.state==='suspended')audio.resume();return}
- try{
-  audio=new (window.AudioContext||window.webkitAudioContext)();
-  engineOsc=audio.createOscillator();engineGain=audio.createGain();
-  engineOsc.type='sawtooth';engineOsc.frequency.value=75;
-  engineGain.gain.value=0.015;
-  engineOsc.connect(engineGain);engineGain.connect(audio.destination);engineOsc.start();
- }catch(e){}
+function endGame(){
+ running=false;beep(110,.5,'sawtooth');
+ if(score>best){best=score;localStorage.setItem('cinarRacingBest',best)}
+ bestEl.textContent=best;
+ overlay.innerHTML='<h2>💥 KAZA!</h2><p>Puanın: '+score+'</p><p>Rekor: '+best+'</p><button id="restart">TEKRAR OYNA</button>';
+ overlay.style.display='flex';
+ document.getElementById('restart').onclick=startGame;
 }
-function beep(freq,duration,type='sine',volume=.15){
- if(!audio)return;
- try{
-  let o=audio.createOscillator(),g=audio.createGain();
-  o.type=type;o.frequency.value=freq;g.gain.value=volume;
-  o.connect(g);g.connect(audio.destination);
-  o.start();g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);
-  o.stop(audio.currentTime+duration);
- }catch(e){}
+function startGame(){
+ audio=audio||new (window.AudioContext||window.webkitAudioContext)();
+ if(audio.state==='suspended')audio.resume();
+ score=0;scoreEl.textContent=0;traffic=[];spawn=0;speed=4;
+ player={x:W/2-18,y:H-100,w:36,h:62};
+ overlay.style.display='none';running=true;last=performance.now();
+ beep(660,.12);requestAnimationFrame(loop);
 }
-function crashSound(){
- if(!audio)return;
- beep(95,.5,'sawtooth',.3);setTimeout(()=>beep(55,.35,'square',.2),100);
-}
-function trophySound(){beep(523,.18);setTimeout(()=>beep(659,.18),160);setTimeout(()=>beep(784,.3),320)}
-function finish(){
+function loop(now){
  if(!running)return;
- running=false;crashSound();
- document.getElementById('message').style.display='block';
- document.getElementById('result').textContent='💥 KAZA YAPTIN!';
- document.getElementById('final').textContent='Puanın: '+score+' | Rekor: '+best;
- if(engineGain)engineGain.gain.setTargetAtTime(0,audio.currentTime,.1);
-}
-function update(dt){
- if(!running)return;
- const step=Math.min(dt/16.67,2);
- speed=4+Math.min(score/120,5);
- if(left)playerX-=5*step;
- if(right)playerX+=5*step;
- const rw=Math.min(W*.78,430),rx=(W-rw)/2,cw=Math.max(29,Math.min(42,rw*.12)),ch=cw*1.65;
- playerX=Math.max(rx+cw*.7,Math.min(rx+rw-cw*.7,playerX));
- roadOffset=(roadOffset+speed*step)%54;
+ const dt=Math.min(2,(now-last)/16.67||1);last=now;
+ roadMove+=speed*dt;
+ if(left)player.x-=5*dt;
+ if(right)player.x+=5*dt;
+ const rw=W*.76,rx=(W-rw)/2;
+ player.x=Math.max(rx+10,Math.min(rx+rw-player.w-10,player.x));
  spawn+=dt;
- if(spawn>950){spawn=0;let lanes=[rx+rw*.28,rx+rw*.72];traffic.push({x:lanes[Math.random()<.5?0:1],y:-ch,color:['#29aaff','#ffd329','#b65cff','#eeeeee'][Math.floor(Math.random()*4)]})}
- traffic.forEach(t=>t.y+=speed*step);
- traffic=traffic.filter(t=>t.y<H+80);
- for(const t of traffic){
-  if(Math.abs(t.x-playerX)<cw*.82&&Math.abs(t.y-(H-ch-12))<ch*.82){finish();break}
+ if(spawn>Math.max(22,58-score*.15)){
+  spawn=0;
+  const lanes=[rx+rw*.18,rx+rw*.42,rx+rw*.66];
+  const lane=lanes[Math.floor(Math.random()*lanes.length)];
+  traffic.push({x:lane,y:-75,w:34,h:58,color:['#ff4057','#ffb52e','#a36bff','#e8e8e8'][Math.floor(Math.random()*4)],passed:false});
  }
- score+=Math.floor(step);
- scoreEl.textContent=score;
- if(engineOsc)engineOsc.frequency.setTargetAtTime(65+speed*7,audio.currentTime,.1);
- if(score>best&&score%10===0){best=score;bestEl.textContent=best;localStorage.setItem('cinarRaceBest',best)}
- if(score>0&&score%500===0){trophySound()}
+ for(let i=traffic.length-1;i>=0;i--){
+  const t=traffic[i];t.y+=(speed+score*.012)*dt;
+  if(!t.passed&&t.y>player.y+player.h){t.passed=true;score++;scoreEl.textContent=score;if(score%5===0){beep(660,.12);setTimeout(()=>beep(880,.18),130)}}
+  const pad=8;
+  if(player.x+pad<t.x+t.w-pad&&player.x+player.w-pad>t.x+pad&&player.y+pad<t.y+t.h-pad&&player.y+player.h-pad>t.y+pad){draw();endGame();return}
+  if(t.y>H+80)traffic.splice(i,1);
+ }
+ speed=4+Math.min(4,score*.035);
+ draw();requestAnimationFrame(loop);
 }
-function loop(now){if(!last)last=now;let dt=now-last;last=now;update(dt);draw();requestAnimationFrame(loop)}
-requestAnimationFrame(loop);
-
-function hold(id,which){
- const b=document.getElementById(id);
- const on=e=>{e.preventDefault();initAudio();if(which==='left')left=true;else right=true};
- const off=e=>{e.preventDefault();if(which==='left')left=false;else right=false};
- b.addEventListener('pointerdown',on);
- b.addEventListener('pointerup',off);
- b.addEventListener('pointercancel',off);
- b.addEventListener('pointerleave',off);
+function hold(button,side){
+ button.addEventListener('pointerdown',e=>{e.preventDefault();if(side==='left')left=true;else right=true;try{button.setPointerCapture(e.pointerId)}catch(_){}});
+ const stop=()=>{if(side==='left')left=false;else right=false};
+ button.addEventListener('pointerup',stop);button.addEventListener('pointercancel',stop);button.addEventListener('lostpointercapture',stop);
 }
-hold('left','left');hold('right','right');
-document.getElementById('restart').addEventListener('click',()=>{
- initAudio();score=0;traffic=[];spawn=0;running=true;last=0;
- scoreEl.textContent='0';document.getElementById('message').style.display='none';
- if(engineGain)engineGain.gain.setTargetAtTime(.015,audio.currentTime,.1);
-});
-document.addEventListener('contextmenu',e=>e.preventDefault());
-document.addEventListener('gesturestart',e=>e.preventDefault(),{passive:false});
-document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+hold(document.getElementById('left'),'left');hold(document.getElementById('right'),'right');
+document.getElementById('start').onclick=startGame;
+window.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='a')left=true;if(e.key==='ArrowRight'||e.key==='d')right=true});
+window.addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')left=false;if(e.key==='ArrowRight'||e.key==='d')right=false});
+resize();
 </script>
 </body>
 </html>
