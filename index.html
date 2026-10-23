@@ -9,532 +9,377 @@
 <title>Çınar Games | Oyun Dünyası</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080b16;--card:#121a2b;--blue:#168cff;--purple:#8b5cf6;--white:#fff;--muted:#aab5ca}
+html{scroll-behavior:smooth}
+body{min-height:100vh;background:var(--bg);color:var(--white);font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit}
+button{cursor:pointer}
+.container{width:min(1100px,92%);margin:auto}
 
-:root{
-  --bg:#080b16;
-  --card:#121a2b;
-  --blue:#168cff;
-  --purple:#8b5cf6;
-  --white:#ffffff;
-  --muted:#aab5ca;
+/* Hareketli arka plan */
+body::before{
+ content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+ background:
+ radial-gradient(2px 2px at 10% 20%,#ffffffaa 50%,transparent 100%),
+ radial-gradient(2px 2px at 70% 30%,#8ccfff99 50%,transparent 100%),
+ radial-gradient(1px 1px at 40% 80%,#ffffffaa 50%,transparent 100%),
+ radial-gradient(2px 2px at 90% 70%,#bbaaff99 50%,transparent 100%),
+ radial-gradient(1px 1px at 20% 60%,#ffffffaa 50%,transparent 100%);
+ background-size:300px 300px;
+ animation:stars 22s linear infinite;
 }
+@keyframes stars{from{background-position:0 0}to{background-position:300px 600px}}
 
-html{
-  scroll-behavior:smooth;
-}
+/* Üst menü */
+header{position:sticky;top:0;z-index:100;background:#080b16ed;border-bottom:1px solid #ffffff12;backdrop-filter:blur(14px)}
+.navbar{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-size:22px;font-weight:900;letter-spacing:-.5px}
+.logo span{color:var(--blue)}
+.nav-links{display:flex;gap:20px;align-items:center;font-size:14px;color:var(--muted)}
+.nav-links a{transition:color .2s}
+.nav-links a:hover{color:white}
+.menu-btn{display:none;background:#17243a;color:white;border:1px solid #ffffff25;border-radius:10px;padding:9px 12px}
 
-body{
-  min-height:100vh;
-  background:var(--bg);
-  color:var(--white);
-  font-family:Arial,Helvetica,sans-serif;
-  overflow-x:hidden;
-}
+/* Ana bölüm */
+.hero{position:relative;overflow:hidden;text-align:center;padding:85px 15px 75px;background:radial-gradient(ellipse at 50% 10%,#163d79 0%,transparent 55%),linear-gradient(180deg,#0b1225,#080b16)}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;filter:blur(35px);pointer-events:none}
+.hero::before{width:260px;height:260px;background:#168cff25;left:-100px;bottom:-150px}
+.hero::after{width:220px;height:220px;background:#8b5cf625;right:-80px;top:20px}
+.hero-content{position:relative;z-index:1;max-width:720px;margin:auto}
+.tag{display:inline-block;padding:8px 13px;border:1px solid #168cff65;border-radius:30px;color:#83c4ff;background:#168cff12;font-size:12px;font-weight:bold;margin-bottom:20px}
+.hero h1{font-size:clamp(38px,8vw,68px);font-weight:900;line-height:1.08;letter-spacing:-2px}
+.hero h1 span{background:linear-gradient(90deg,#168cff,#a78bfa,#168cff);background-size:200%;animation:shine 5s linear infinite;-webkit-background-clip:text;background-clip:text;color:transparent}
+@keyframes shine{to{background-position:200% center}}
+.hero p{max-width:550px;margin:20px auto 25px;color:var(--muted);line-height:1.7;font-size:16px}
+.main-button{display:inline-flex;justify-content:center;align-items:center;gap:8px;padding:14px 23px;border-radius:12px;background:linear-gradient(100deg,#087dff,#6555ed);color:white;font-weight:800;box-shadow:0 8px 28px #168cff30;transition:transform .2s,filter .2s}
+.main-button:hover{transform:translateY(-3px);filter:brightness(1.12)}
 
-a{
-  color:inherit;
-  text-decoration:none;
-}
+/* Oyunlar */
+.games-section{padding:45px 0 65px;scroll-margin-top:85px}
+.section-heading{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:24px}
+.section-heading h2{font-size:27px;margin-bottom:8px}
+.section-heading p{color:var(--muted);font-size:14px;line-height:1.5}
+.game-count{color:#9bcfff;background:#168cff18;border:1px solid #168cff35;border-radius:10px;padding:8px 10px;font-size:12px;white-space:nowrap}
+.search-wrap{margin-bottom:20px}
+#gameSearch{width:100%;padding:14px 16px;border-radius:12px;border:1px solid #ffffff20;background:#101829;color:white;outline:none;transition:border .2s,box-shadow .2s}
+#gameSearch:focus{border-color:var(--blue);box-shadow:0 0 0 3px #168cff20}
+.games-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.game-card{min-width:0;overflow:hidden;border:1px solid #ffffff17;background:linear-gradient(160deg,#151e32,#101624);border-radius:18px;transition:transform .25s,border-color .25s,box-shadow .25s}
+.game-card:hover{transform:translateY(-6px);border-color:#168cff80;box-shadow:0 12px 35px #168cff19}
+.game-art{min-height:180px;display:flex;justify-content:center;align-items:center;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 100%,#168cff45,transparent 65%),linear-gradient(135deg,#142c50,#111629)}
+.game-art::after{content:"";position:absolute;width:160px;height:160px;border:1px solid #ffffff15;border-radius:50%;animation:ring 9s linear infinite}
+@keyframes ring{to{transform:rotate(360deg) scale(1.15)}}
+.game-art .emoji{position:relative;z-index:1;font-size:85px;filter:drop-shadow(0 10px 15px #0008);transition:transform .25s}
+.game-card:hover .emoji{transform:scale(1.13) rotate(-4deg)}
+.game-number{position:absolute;top:12px;left:12px;padding:6px 9px;border-radius:8px;background:#080b16bd;border:1px solid #ffffff20;font-size:11px;color:#dce8ff;z-index:2}
+.game-info{padding:18px}
+.game-info h3{font-size:20px;margin-bottom:9px}
+.game-info p{color:var(--muted);font-size:13px;line-height:1.65;min-height:42px;margin-bottom:15px}
+.game-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.game-tags span{font-size:11px;padding:6px 8px;border-radius:7px;background:#ffffff0b;color:#c8d5e9;border:1px solid #ffffff12}
+.play-button{display:flex;justify-content:center;align-items:center;gap:8px;width:100%;border:0;border-radius:10px;padding:13px;background:var(--blue);color:white;font-size:14px;font-weight:800;transition:background .2s,transform .2s}
+.play-button:hover{background:#006de0;transform:scale(1.02)}
+#noResults{display:none;color:var(--muted);text-align:center;padding:25px}
 
-button{
-  font:inherit;
-}
+/* Müzik bölümü */
+.music-section{padding:0 0 60px;scroll-margin-top:85px}
+.music-card{display:grid;grid-template-columns:1fr 300px;gap:24px;align-items:center;border:1px solid #8b5cf640;border-radius:20px;background:linear-gradient(120deg,#15152c,#101a2a);padding:24px;box-shadow:0 10px 35px #0002}
+.music-label{display:inline-block;color:#c4b5fd;background:#8b5cf620;border:1px solid #8b5cf640;border-radius:20px;padding:7px 11px;font-size:11px;font-weight:bold;margin-bottom:12px}
+.music-text h2{font-size:23px;margin-bottom:10px}
+.music-text p{font-size:14px;color:var(--muted);line-height:1.7}
+.music-frame{width:100%;aspect-ratio:16/9;border:1px solid #ffffff20;border-radius:12px;overflow:hidden;background:#080b16}
+.music-frame iframe{width:100%;height:100%;border:0}
+#musicHint{font-size:12px;color:#aab5ca;margin-top:10px}
 
-.container{
-  width:min(1100px,92%);
-  margin:auto;
-}
+/* Hakkımızda */
+.about{padding:10px 0 60px;scroll-margin-top:85px}
+.about-box{border:1px solid #ffffff14;border-radius:18px;background:linear-gradient(120deg,#121b2e,#101321);padding:28px;display:flex;align-items:center;gap:20px}
+.about-icon{font-size:45px;flex-shrink:0}
+.about-box h2{font-size:22px;margin-bottom:9px}
+.about-box p{color:var(--muted);font-size:14px;line-height:1.7}
 
-/* ÜST MENÜ */
-header{
-  position:sticky;
-  top:0;
-  z-index:100;
-  background:#080b16ed;
-  border-bottom:1px solid #ffffff12;
-  backdrop-filter:blur(14px);
-}
+/* Alt menü */
+footer{border-top:1px solid #ffffff12;padding:25px 0;color:var(--muted);font-size:13px}
+.footer-content{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.footer-logo{color:white;font-weight:bold;font-size:16px}
 
-.navbar{
-  min-height:68px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
+/* Sol ses düğmesi ve yukarı çık */
+#musicToggle{position:fixed;left:14px;bottom:20px;z-index:150;border:1px solid #ffffff35;border-radius:30px;padding:12px 15px;color:white;background:linear-gradient(110deg,#087dff,#7252e8);box-shadow:0 6px 24px #168cff40;font-size:13px;font-weight:bold}
+#musicToggle:hover{filter:brightness(1.15)}
+#topBtn{position:fixed;right:15px;bottom:20px;z-index:150;width:43px;height:43px;border:1px solid #ffffff30;border-radius:50%;background:#17243a;color:white;font-size:20px;display:none}
+#topBtn.show{display:block}
 
-.logo{
-  font-size:22px;
-  font-weight:900;
-  letter-spacing:-.5px;
-}
-
-.logo span{
-  color:var(--blue);
-}
-
-.nav-links{
-  display:flex;
-  gap:20px;
-  align-items:center;
-  font-size:14px;
-  color:var(--muted);
-}
-
-.nav-links a:hover{
-  color:white;
-}
-
-/* ANA BÖLÜM */
-.hero{
-  position:relative;
-  overflow:hidden;
-  text-align:center;
-  padding:85px 15px 75px;
-  background:
-    radial-gradient(ellipse at 50% 10%,#163d79 0%,transparent 55%),
-    linear-gradient(180deg,#0b1225,#080b16);
-}
-
-.hero::before{
-  content:"";
-  position:absolute;
-  width:280px;
-  height:280px;
-  border-radius:50%;
-  background:#168cff15;
-  filter:blur(25px);
-  left:-100px;
-  bottom:-150px;
-}
-
-.hero-content{
-  position:relative;
-  max-width:720px;
-  margin:auto;
-}
-
-.tag{
-  display:inline-block;
-  padding:8px 13px;
-  border:1px solid #168cff65;
-  border-radius:30px;
-  color:#83c4ff;
-  background:#168cff12;
-  font-size:12px;
-  font-weight:bold;
-  margin-bottom:20px;
-}
-
-.hero h1{
-  font-size:clamp(38px,8vw,68px);
-  font-weight:900;
-  line-height:1.08;
-  letter-spacing:-2px;
-}
-
-.hero h1 span{
-  background:linear-gradient(90deg,#168cff,#a78bfa);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-
-.hero p{
-  max-width:550px;
-  margin:20px auto 25px;
-  color:var(--muted);
-  line-height:1.7;
-  font-size:16px;
-}
-
-.main-button{
-  display:inline-flex;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-  padding:14px 23px;
-  border-radius:12px;
-  background:linear-gradient(100deg,#087dff,#6555ed);
-  color:white;
-  font-weight:800;
-  box-shadow:0 8px 28px #168cff30;
-  transition:transform .2s,filter .2s;
-}
-
-.main-button:hover{
-  transform:translateY(-3px);
-  filter:brightness(1.12);
-}
-
-/* OYUNLAR */
-.games-section{
-  padding:45px 0 65px;
-  scroll-margin-top:85px;
-}
-
-.section-heading{
-  display:flex;
-  justify-content:space-between;
-  align-items:end;
-  gap:12px;
-  margin-bottom:24px;
-}
-
-.section-heading h2{
-  font-size:27px;
-  margin-bottom:8px;
-}
-
-.section-heading p{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.5;
-}
-
-.game-count{
-  color:#9bcfff;
-  background:#168cff18;
-  border:1px solid #168cff35;
-  border-radius:10px;
-  padding:8px 10px;
-  font-size:12px;
-  white-space:nowrap;
-}
-
-.games-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:20px;
-}
-
-.game-card{
-  min-width:0;
-  overflow:hidden;
-  border:1px solid #ffffff17;
-  background:linear-gradient(160deg,#151e32,#101624);
-  border-radius:18px;
-  transition:transform .2s,border-color .2s;
-}
-
-.game-card:hover{
-  transform:translateY(-5px);
-  border-color:#168cff80;
-}
-
-.game-art{
-  min-height:180px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  position:relative;
-  overflow:hidden;
-  background:
-    radial-gradient(ellipse at 50% 100%,#168cff45,transparent 65%),
-    linear-gradient(135deg,#142c50,#111629);
-}
-
-.game-art .emoji{
-  font-size:85px;
-  filter:drop-shadow(0 10px 15px #0008);
-  transition:transform .25s;
-}
-
-.game-card:hover .emoji{
-  transform:scale(1.08);
-}
-
-.game-number{
-  position:absolute;
-  top:12px;
-  left:12px;
-  padding:6px 9px;
-  border-radius:8px;
-  background:#080b16bd;
-  border:1px solid #ffffff20;
-  font-size:11px;
-  color:#dce8ff;
-}
-
-.game-info{
-  padding:18px;
-}
-
-.game-info h3{
-  font-size:20px;
-  margin-bottom:9px;
-}
-
-.game-info p{
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.65;
-  min-height:42px;
-  margin-bottom:15px;
-}
-
-.game-tags{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-bottom:16px;
-}
-
-.game-tags span{
-  font-size:11px;
-  padding:6px 8px;
-  border-radius:7px;
-  background:#ffffff0b;
-  color:#c8d5e9;
-  border:1px solid #ffffff12;
-}
-
-.play-button{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-  width:100%;
-  border:0;
-  border-radius:10px;
-  padding:13px;
-  background:var(--blue);
-  color:white;
-  font-size:14px;
-  font-weight:800;
-  transition:background .2s;
-}
-
-.play-button:hover{
-  background:#006de0;
-}
-
-/* BİLGİ BÖLÜMÜ */
-.about{
-  padding:35px 0 60px;
-}
-
-.about-box{
-  border:1px solid #ffffff14;
-  border-radius:18px;
-  background:linear-gradient(120deg,#121b2e,#101321);
-  padding:28px;
-  display:flex;
-  align-items:center;
-  gap:20px;
-}
-
-.about-icon{
-  font-size:45px;
-  flex-shrink:0;
-}
-
-.about-box h2{
-  font-size:22px;
-  margin-bottom:9px;
-}
-
-.about-box p{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.7;
-}
-
-/* ALT MENÜ */
-footer{
-  border-top:1px solid #ffffff12;
-  padding:25px 0;
-  color:var(--muted);
-  font-size:13px;
-}
-
-.footer-content{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  flex-wrap:wrap;
-}
-
-.footer-logo{
-  color:white;
-  font-weight:bold;
-  font-size:16px;
-}
+/* Görünme animasyonu */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s}
+.reveal.visible{opacity:1;transform:translateY(0)}
 
 @media(max-width:760px){
-  .games-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:12px;
-  }
-
-  .game-art{
-    min-height:135px;
-  }
-
-  .game-art .emoji{
-    font-size:65px;
-  }
-
-  .game-info{
-    padding:13px;
-  }
-
-  .game-info h3{
-    font-size:17px;
-  }
-
-  .game-info p{
-    font-size:12px;
-    min-height:58px;
-  }
-
-  .section-heading h2{
-    font-size:23px;
-  }
-
-  .hero{
-    padding:65px 12px 60px;
-  }
+ .games-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .game-art{min-height:135px}
+ .game-art .emoji{font-size:65px}
+ .game-info{padding:13px}
+ .game-info h3{font-size:17px}
+ .game-info p{font-size:12px;min-height:58px}
+ .section-heading h2{font-size:23px}
+ .hero{padding:65px 12px 60px}
+ .music-card{grid-template-columns:1fr;padding:18px}
+ .music-frame{max-width:440px}
 }
-
+@media(max-width:520px){
+ .navbar{min-height:62px}
+ .menu-btn{display:block}
+ .nav-links{display:none;position:absolute;top:62px;left:0;right:0;padding:16px 4%;background:#080b16fa;border-bottom:1px solid #ffffff20;flex-direction:column;align-items:stretch;gap:0}
+ .nav-links.open{display:flex}
+ .nav-links a{padding:13px 4px}
+ .logo{font-size:19px}
+ .music-text h2{font-size:21px}
+ .about-box{padding:20px;align-items:flex-start}
+ .about-icon{font-size:35px}
+ #musicToggle{left:9px;bottom:12px;padding:11px 12px;font-size:12px}
+ #topBtn{right:10px;bottom:12px}
+}
 @media(max-width:380px){
-  .games-grid{
-    grid-template-columns:1fr;
-  }
-
-  .game-art{
-    min-height:170px;
-  }
-
-  .game-info p{
-    min-height:0;
-  }
-
-  .nav-links{
-    gap:10px;
-    font-size:12px;
-  }
-
-  .logo{
-    font-size:19px;
-  }
+ .games-grid{grid-template-columns:1fr}
+ .game-art{min-height:170px}
+ .game-info p{min-height:0}
+ .section-heading{align-items:flex-start;flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
 </style>
 </head>
 
 <body>
-
 <header>
-  <div class="container navbar">
-    <a class="logo" href="./">🎮 ÇINAR<span> GAMES</span></a>
-
-    <nav class="nav-links">
-      <a href="./">Ana Sayfa</a>
-      <a href="#games">Oyunlar</a>
-      <a href="#about">Hakkımızda</a>
-    </nav>
-  </div>
+ <div class="container navbar">
+  <a class="logo" href="./">🎮 ÇINAR<span> GAMES</span></a>
+  <button class="menu-btn" id="menuBtn" aria-label="Menüyü aç" aria-expanded="false">☰ Menü</button>
+  <nav class="nav-links" id="navLinks">
+   <a href="./">Ana Sayfa</a>
+   <a href="#games">Oyunlar</a>
+   <a href="#music">Müzik</a>
+   <a href="#about">Hakkımızda</a>
+  </nav>
+ </div>
 </header>
 
 <main>
+ <section class="hero">
+  <div class="hero-content">
+   <div class="tag">🎮 ÇINAR GAMES'E HOŞ GELDİN</div>
+   <h1>OYUN DÜNYANA<br><span>HOŞ GELDİN!</span></h1>
+   <p>Kendi oyun dünyanı keşfet! Çınar Games'te oyunlarını aç, yarışlara katıl ve eğlenceye hemen başla. Üstelik telefonundan da oynayabilirsin.</p>
+   <a class="main-button" href="#games">🎮 OYUNLARI KEŞFET</a>
+  </div>
+ </section>
 
-  <section class="hero">
-    <div class="hero-content">
-      <div class="tag">🎮 ÇINAR GAMES'E HOŞ GELDİN</div>
+ <section class="games-section container" id="games">
+  <div class="section-heading">
+   <div>
+    <h2>🎮 Oyunlarımız</h2>
+    <p>Bir oyun seç ve maceraya başla!</p>
+   </div>
+   <span class="game-count">🏁 Oynamaya hazır</span>
+  </div>
 
-      <h1>
-        OYUN DÜNYANA<br>
-        <span>HOŞ GELDİN!</span>
-      </h1>
+  <div class="search-wrap">
+   <input id="gameSearch" type="search" placeholder="🔎 Oyun ara..." aria-label="Oyun ara">
+  </div>
 
-      <p>
-        Kendi oyun dünyanı keşfet! Çınar Games'te oyunlarını aç,
-        yarışlara katıl ve eğlenceye hemen başla.
-        Üstelik telefonundan da oynayabilirsin.
-      </p>
-
-      <a class="main-button" href="#games">
-        🎮 OYUNLARI KEŞFET
-      </a>
+  <div class="games-grid" id="gamesGrid">
+   <!-- Mevcut Çınar Racing kartı ve bağlantısı korundu -->
+   <article class="game-card reveal" data-search="çınar racing araba yarış araba dokunmatik skor">
+    <a href="./games/index.html" aria-label="Çınar Racing oyununu aç">
+     <div class="game-art">
+      <span class="game-number">01 • YARIŞ</span>
+      <span class="emoji">🏎️</span>
+     </div>
+    </a>
+    <div class="game-info">
+     <h3>Çınar Racing</h3>
+     <p>Dört şeritli yolda yarış! Rakip araçları geç, hızlan, skor topla ve yeni arabaların kilidini aç.</p>
+     <div class="game-tags">
+      <span>🏎️ Araba</span>
+      <span>📱 Dokunmatik</span>
+      <span>🏆 Skor</span>
+     </div>
+     <a class="play-button" href="./games/index.html">▶ OYNA</a>
     </div>
-  </section>
+   </article>
+  </div>
+  <p id="noResults">Bu isimde bir oyun bulunamadı. 🔎</p>
+ </section>
 
-  <section class="games-section container" id="games">
-    <div class="section-heading">
-      <div>
-        <h2>🎮 Oyunlarımız</h2>
-        <p>Bir oyun seç ve maceraya başla!</p>
-      </div>
+ <section class="music-section container" id="music">
+  <div class="music-card reveal">
+   <div class="music-text">
+    <span class="music-label">🎵 ÇINAR GAMES MÜZİK</span>
+    <h2>🎧 Şarkılar Sokaklara Ait</h2>
+    <p>Oyunlarını keşfederken müziğin keyfini çıkar. Şarkıyı buradaki oynatıcıdan başlatabilir, sol alttaki düğmeyle sesi açıp kapatabilirsin.</p>
+    <p id="musicHint">Müzik otomatik başlayamazsa oynatıcıdaki ▶ düğmesine dokun.</p>
+   </div>
+   <div class="music-frame">
+    <div id="youtubePlayer"></div>
+   </div>
+  </div>
+ </section>
 
-      <span class="game-count">🏁 Oynamaya hazır</span>
-    </div>
-
-    <div class="games-grid">
-
-      <!-- ÇINAR RACING -->
-      <article class="game-card">
-        <a href="./games/index.html" aria-label="Çınar Racing oyununu aç">
-          <div class="game-art">
-            <span class="game-number">01 • YARIŞ</span>
-            <span class="emoji">🏎️</span>
-          </div>
-        </a>
-
-        <div class="game-info">
-          <h3>Çınar Racing</h3>
-
-          <p>
-            Dört şeritli yolda yarış! Rakip araçları geç,
-            hızlan, skor topla ve yeni arabaların kilidini aç.
-          </p>
-
-          <div class="game-tags">
-            <span>🏎️ Araba</span>
-            <span>📱 Dokunmatik</span>
-            <span>🏆 Skor</span>
-          </div>
-
-          <a class="play-button" href="./games/index.html">
-            ▶ OYNA
-          </a>
-        </div>
-      </article>
-
-      <!-- YENİ OYUNLAR İÇİN KARTLAR BURAYA EKLENEBİLİR -->
-
-    </div>
-  </section>
-
-  <section class="about container" id="about">
-    <div class="about-box">
-      <div class="about-icon">🚀</div>
-
-      <div>
-        <h2>Çınar Games nedir?</h2>
-        <p>
-          Çınar Games, oyunları kolayca keşfedebileceğin
-          kişisel oyun platformudur. Yeni oyunlar eklendikçe
-          bu sayfadan onlara ulaşabilirsin.
-        </p>
-      </div>
-    </div>
-  </section>
-
+ <section class="about container" id="about">
+  <div class="about-box reveal">
+   <div class="about-icon">🚀</div>
+   <div>
+    <h2>Çınar Games nedir?</h2>
+    <p>Çınar Games, oyunları kolayca keşfedebileceğin kişisel oyun platformudur. Yeni oyunlar eklendikçe bu sayfadan onlara ulaşabilirsin.</p>
+   </div>
+  </div>
+ </section>
 </main>
 
 <footer>
-  <div class="container footer-content">
-    <a class="footer-logo" href="./">🎮 ÇINAR GAMES</a>
-
-    <span>© 2026 Çınar Games • İyi eğlenceler!</span>
-  </div>
+ <div class="container footer-content">
+  <a class="footer-logo" href="./">🎮 ÇINAR GAMES</a>
+  <span>© 2026 Çınar Games • İyi eğlenceler!</span>
+ </div>
 </footer>
 
+<button id="musicToggle" aria-label="Müziğin sesini aç veya kapat">🔊 Sesi Aç</button>
+<button id="topBtn" aria-label="Yukarı çık">↑</button>
+
+<script>
+"use strict";
+
+/* Mobil menü */
+const menuBtn=document.getElementById("menuBtn");
+const navLinks=document.getElementById("navLinks");
+
+menuBtn.addEventListener("click",()=>{
+ const open=navLinks.classList.toggle("open");
+ menuBtn.setAttribute("aria-expanded",String(open));
+ menuBtn.textContent=open?"✕ Kapat":"☰ Menü";
+});
+
+navLinks.querySelectorAll("a").forEach(link=>{
+ link.addEventListener("click",()=>{
+  navLinks.classList.remove("open");
+  menuBtn.setAttribute("aria-expanded","false");
+  menuBtn.textContent="☰ Menü";
+ });
+});
+
+/* Oyun arama */
+const gameSearch=document.getElementById("gameSearch");
+const gameCards=[...document.querySelectorAll(".game-card")];
+const noResults=document.getElementById("noResults");
+
+gameSearch.addEventListener("input",()=>{
+ const q=gameSearch.value.trim().toLocaleLowerCase("tr-TR");
+ let visible=0;
+
+ gameCards.forEach(card=>{
+  const text=(card.innerText+" "+card.dataset.search).toLocaleLowerCase("tr-TR");
+  const match=text.includes(q);
+  card.style.display=match?"":"none";
+  if(match)visible++;
+ });
+
+ noResults.style.display=visible?"none":"block";
+});
+
+/* Kartlar görünürken yumuşak animasyon */
+if("IntersectionObserver" in window){
+ const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+   if(entry.isIntersecting){
+    entry.target.classList.add("visible");
+    observer.unobserve(entry.target);
+   }
+  });
+ },{threshold:.12});
+
+ document.querySelectorAll(".reveal").forEach(el=>observer.observe(el));
+}else{
+ document.querySelectorAll(".reveal").forEach(el=>el.classList.add("visible"));
+}
+
+/* Yukarı çık düğmesi */
+const topBtn=document.getElementById("topBtn");
+
+window.addEventListener("scroll",()=>{
+ topBtn.classList.toggle("show",window.scrollY>350);
+},{passive:true});
+
+topBtn.addEventListener("click",()=>{
+ window.scrollTo({top:0,behavior:"smooth"});
+});
+
+/* YouTube müzik oynatıcısı */
+let musicPlayer=null;
+let musicReady=false;
+let musicMuted=true;
+
+function onYouTubeIframeAPIReady(){
+ musicPlayer=new YT.Player("youtubePlayer",{
+  width:"100%",
+  height:"100%",
+  videoId:"YiJAxtSdeTw",
+  playerVars:{
+   autoplay:1,
+   controls:1,
+   playsinline:1,
+   rel:0
+  },
+  events:{
+   onReady:function(event){
+    musicReady=true;
+    event.target.mute();
+    event.target.playVideo();
+    updateMusicButton();
+   },
+   onError:function(){
+    document.getElementById("musicHint").textContent=
+     "Müzik yüklenemedi. Oynatıcıyı yenilemeyi deneyebilirsin.";
+   }
+  }
+ });
+}
+
+function updateMusicButton(){
+ const btn=document.getElementById("musicToggle");
+ btn.textContent=musicMuted?"🔊 Sesi Aç":"🔇 Sesi Kapat";
+ btn.setAttribute("aria-label",musicMuted?"Müziğin sesini aç":"Müziğin sesini kapat");
+}
+
+document.getElementById("musicToggle").addEventListener("click",()=>{
+ if(!musicReady||!musicPlayer){
+  document.getElementById("musicHint").textContent=
+   "Müzik yükleniyor. Biraz bekleyip tekrar dene.";
+  return;
+ }
+
+ if(musicPlayer.getPlayerState()!==YT.PlayerState.PLAYING){
+  musicPlayer.playVideo();
+ }
+
+ if(musicMuted){
+  musicPlayer.unMute();
+  musicPlayer.setVolume(70);
+  musicMuted=false;
+ }else{
+  musicPlayer.mute();
+  musicMuted=true;
+ }
+
+ updateMusicButton();
+});
+
+/* YouTube oynatıcı API'sini yükle */
+const ytScript=document.createElement("script");
+ytScript.src="https://www.youtube.com/iframe_api";
+ytScript.async=true;
+document.head.appendChild(ytScript);
+</script>
 </body>
 </html>
