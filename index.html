@@ -2,176 +2,61 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080b16">
-  <meta name="description" content="Çınar Games - Tarayıcıdan ücretsiz oyunlar oyna!">
-  <title>Çınar Games | Ücretsiz Oyunlar</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b16">
+<meta name="description" content="Çınar Games - Ücretsiz tarayıcı oyunları oyna!">
+<title>Çınar Games - Oyun Dünyası</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: Arial, sans-serif;
-      background: #080b16;
-      color: white;
-      min-height: 100vh;
-    }
-
-    header {
-      padding: 22px 7%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #252b42;
-    }
-
-    .logo {
-      font-size: 25px;
-      font-weight: 900;
-      color: #64f5ff;
-    }
-
-    .hero {
-      text-align: center;
-      padding: 75px 20px 45px;
-    }
-
-    .tag {
-      color: #64f5ff;
-      font-size: 13px;
-      letter-spacing: 3px;
-      margin-bottom: 18px;
-    }
-
-    h1 {
-      font-size: clamp(38px, 8vw, 68px);
-      margin-bottom: 18px;
-    }
-
-    h1 span {
-      color: #64f5ff;
-    }
-
-    .hero p {
-      color: #aeb6d0;
-      font-size: 17px;
-      line-height: 1.7;
-      max-width: 550px;
-      margin: 0 auto 28px;
-    }
-
-    .games {
-      padding: 25px 7% 70px;
-      max-width: 1100px;
-      margin: auto;
-    }
-
-    .section-title {
-      font-size: 27px;
-      margin-bottom: 22px;
-    }
-
-    .game-card {
-      background: #11172a;
-      border: 1px solid #29314e;
-      border-radius: 20px;
-      overflow: hidden;
-      max-width: 520px;
-      transition: transform 0.2s;
-    }
-
-    .game-card:hover {
-      transform: translateY(-5px);
-    }
-
-    .game-image {
-      height: 190px;
-      background: linear-gradient(135deg, #111b38, #123f55, #11172a);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 85px;
-    }
-
-    .game-info {
-      padding: 23px;
-    }
-
-    .game-info h3 {
-      font-size: 23px;
-      margin-bottom: 10px;
-    }
-
-    .game-info p {
-      color: #aeb6d0;
-      line-height: 1.6;
-      margin-bottom: 22px;
-    }
-
-    .play-button {
-      display: block;
-      text-align: center;
-      background: #64f5ff;
-      color: #080b16;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 15px;
-      border-radius: 11px;
-    }
-
-    .play-button:active {
-      transform: scale(0.98);
-    }
-
-    footer {
-      border-top: 1px solid #252b42;
-      text-align: center;
-      color: #858da8;
-      padding: 25px 15px;
-      font-size: 14px;
-    }
-  </style>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#080b16;color:white;min-height:100vh}
+header{padding:22px 6%;border-bottom:1px solid #29314e;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:23px;font-weight:900;color:#64f5ff}
+.hero{text-align:center;padding:75px 20px 55px;background:radial-gradient(ellipse at top,#18334e,#080b16 70%)}
+.hero small{color:#64f5ff;letter-spacing:4px;font-weight:bold}
+h1{font-size:clamp(38px,8vw,65px);margin:22px 0}
+h1 span{color:#64f5ff}
+.hero p{color:#bdc5da;line-height:1.8;max-width:520px;margin:0 auto 30px}
+.button{display:inline-block;background:#64f5ff;color:#080b16;text-decoration:none;padding:16px 28px;border-radius:12px;font-weight:bold}
+main{max-width:1000px;margin:auto;padding:35px 20px 70px}
+h2{font-size:27px;margin-bottom:25px}
+.card{max-width:450px;background:#11172a;border:1px solid #29314e;border-radius:20px;overflow:hidden}
+.cover{height:190px;display:flex;justify-content:center;align-items:center;font-size:90px;background:linear-gradient(135deg,#111b38,#126078,#11172a)}
+.info{padding:23px}
+.info h3{font-size:24px;margin-bottom:12px}
+.info p{color:#bdc5da;line-height:1.7;margin-bottom:22px}
+.play{display:block;background:#64f5ff;color:#080b16;text-decoration:none;text-align:center;padding:15px;border-radius:10px;font-weight:bold}
+.play:hover,.button:hover{background:#a3fbff}
+footer{text-align:center;padding:25px;color:#858da8;border-top:1px solid #29314e}
+</style>
 </head>
 
 <body>
-  <header>
-    <div class="logo">🎮 ÇINAR GAMES</div>
-  </header>
+<header>
+  <div class="logo">🎮 ÇINAR GAMES</div>
+</header>
 
-  <section class="hero">
-    <div class="tag">OYNA · EĞLEN · YARIŞ</div>
-    <h1>Oyun dünyana <span>hoş geldin!</span></h1>
-    <p>
-      Çınar Games'e hoş geldin! Ücretsiz tarayıcı oyunlarını
-      keşfet. Hiçbir şey indirmeden hemen oynamaya başla.
-    </p>
-  </section>
+<section class="hero">
+  <small>OYNA · EĞLEN · KAZAN</small>
+  <h1>Oyun dünyana<br><span>hoş geldin!</span></h1>
+  <p>Çınar Games'e hoş geldin! Ücretsiz oyunlarını keşfet, yarışa katıl ve kendi rekorunu kır. İndirme yok, beklemek yok!</p>
+  <a class="button" href="#oyunlar">🎮 OYUNLARI KEŞFET</a>
+</section>
 
-  <section class="games">
-    <h2 class="section-title">🎮 Oyunlarımız</h2>
+<main id="oyunlar">
+  <h2>🔥 Oyunlarımız</h2>
 
-    <div class="game-card">
-      <div class="game-image">🏎️</div>
-      <div class="game-info">
-        <h3>Çınar Racing</h3>
-        <p>
-          Trafikte araçlardan kaç, puan topla ve yeni arabaların
-          kilidini aç. Bakalım en yüksek puanı kim yapacak!
-        </p>
-        <a class="play-button" href="./games/index.html">
-          🏁 HEMEN OYNA
-        </a>
-      </div>
+  <div class="card">
+    <div class="cover">🏎️</div>
+    <div class="info">
+      <h3>Çınar Racing</h3>
+      <p>Rakip araçlardan kaç, puan topla ve yeni arabaların kilidini aç. En yüksek puanını yapabilecek misin?</p>
+      <a class="play" href="./games/index.html">🏁 HEMEN OYNA</a>
     </div>
-  </section>
+  </div>
+</main>
 
-  <footer>
-    © 2026 Çınar Games · Tüm hakları saklıdır.
-  </footer>
+<footer>© 2026 Çınar Games · İyi eğlenceler! 🎮</footer>
 </body>
 </html>
