@@ -3,60 +3,235 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080b16">
-<meta name="description" content="Çınar Games - Ücretsiz tarayıcı oyunları oyna!">
-<title>Çınar Games - Oyun Dünyası</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#090b13">
+<meta name="description" content="Çınar Games — ücretsiz yarış oyunları ve 200 araçlık sanal garaj!">
+<title>Çınar Games | Racing World</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#080b16;color:white;min-height:100vh}
-header{padding:22px 6%;border-bottom:1px solid #29314e;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:23px;font-weight:900;color:#64f5ff}
-.hero{text-align:center;padding:75px 20px 55px;background:radial-gradient(ellipse at top,#18334e,#080b16 70%)}
-.hero small{color:#64f5ff;letter-spacing:4px;font-weight:bold}
-h1{font-size:clamp(38px,8vw,65px);margin:22px 0}
-h1 span{color:#64f5ff}
-.hero p{color:#bdc5da;line-height:1.8;max-width:520px;margin:0 auto 30px}
-.button{display:inline-block;background:#64f5ff;color:#080b16;text-decoration:none;padding:16px 28px;border-radius:12px;font-weight:bold}
-main{max-width:1000px;margin:auto;padding:35px 20px 70px}
-h2{font-size:27px;margin-bottom:25px}
-.card{max-width:450px;background:#11172a;border:1px solid #29314e;border-radius:20px;overflow:hidden}
-.cover{height:190px;display:flex;justify-content:center;align-items:center;font-size:90px;background:linear-gradient(135deg,#111b38,#126078,#11172a)}
-.info{padding:23px}
-.info h3{font-size:24px;margin-bottom:12px}
-.info p{color:#bdc5da;line-height:1.7;margin-bottom:22px}
-.play{display:block;background:#64f5ff;color:#080b16;text-decoration:none;text-align:center;padding:15px;border-radius:10px;font-weight:bold}
-.play:hover,.button:hover{background:#a3fbff}
-footer{text-align:center;padding:25px;color:#858da8;border-top:1px solid #29314e}
+:root{--bg:#090b13;--panel:#111522;--line:#252c40;--cyan:#5cf6ff;--muted:#9da8bd}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;touch-action:manipulation}
+body{margin:0;background:var(--bg);color:#fff;font-family:Arial,sans-serif;overflow-x:hidden}
+button,a{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button{font:inherit;cursor:pointer}
+a{color:inherit;text-decoration:none}
+.layout{min-height:100vh}
+.sidebar{position:fixed;inset:0 auto 0 0;width:225px;background:#0d101b;border-right:1px solid var(--line);padding:25px 15px;z-index:5;display:flex;flex-direction:column}
+.brand{font-size:20px;font-weight:900;color:var(--cyan);padding:8px 9px 28px}
+.brand small{display:block;color:#fff;font-size:10px;letter-spacing:4px;margin-top:7px}
+.navtitle{font-size:10px;letter-spacing:2px;color:#66718b;padding:10px}
+.nav{display:flex;flex-direction:column;gap:8px}
+.nav button{border:1px solid transparent;background:transparent;color:#b9c2d5;text-align:left;padding:13px 12px;border-radius:11px}
+.nav button:hover,.nav button.active{background:#182334;color:var(--cyan);border-color:#243b50}
+.sidebottom{margin-top:auto;color:#6f7a90;font-size:12px;line-height:1.7;padding:12px}
+main{margin-left:225px;min-width:0}
+.topbar{height:67px;display:flex;align-items:center;justify-content:space-between;padding:0 4%;border-bottom:1px solid var(--line);background:#0b0e17}
+.status{font-size:12px;color:#a5b0c7}
+.status span{color:#5dffac}
+.menuToggle{display:none;background:#182334;color:#fff;border:1px solid var(--line);padding:9px 12px;border-radius:9px}
+.hero{padding:55px 5% 48px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 78% 30%,#163c50 0,transparent 37%),linear-gradient(125deg,#11172a,#090b13 72%)}
+.hero:after{content:"";position:absolute;width:240px;height:240px;border:1px solid #5cf6ff24;border-radius:50%;right:4%;top:25px;box-shadow:0 0 0 35px #5cf6ff08,0 0 0 70px #5cf6ff05;pointer-events:none}
+.eyebrow{font-size:11px;color:var(--cyan);letter-spacing:4px;font-weight:bold}
+.hero h1{font-size:clamp(35px,5vw,65px);line-height:1.02;margin:20px 0;max-width:700px}
+.hero h1 span{color:var(--cyan)}
+.hero p{max-width:510px;color:#aeb8cc;line-height:1.8;font-size:14px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:25px}
+.primary,.secondary{padding:14px 19px;border-radius:10px;font-weight:bold;border:1px solid var(--cyan)}
+.primary{background:var(--cyan);color:#071017}
+.secondary{background:#151c2b;color:#fff;border-color:#303a52}
+.primary:hover{filter:brightness(1.12)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0 4%;margin-top:-1px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:17px}
+.stat strong{display:block;font-size:24px;color:var(--cyan);margin-bottom:6px}
+.stat span{font-size:11px;color:var(--muted)}
+.section{padding:38px 4%;scroll-margin-top:20px}
+.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:20px}
+.kicker{font-size:10px;letter-spacing:3px;color:var(--cyan)}
+h2{font-size:26px;margin:8px 0 0}
+.sectionhead p{font-size:12px;color:var(--muted);margin:0}
+.feature{display:grid;grid-template-columns:1.1fr .9fr;background:linear-gradient(110deg,#151d30,#101421);border:1px solid #29334b;border-radius:18px;overflow:hidden}
+.featureart{min-height:210px;display:flex;align-items:center;justify-content:center;position:relative;background:radial-gradient(ellipse,#22566a,#101827 65%);font-size:100px}
+.featureart:after{content:"";position:absolute;left:12%;right:12%;bottom:28px;height:3px;background:var(--cyan);box-shadow:0 0 20px var(--cyan)}
+.featureinfo{padding:26px;align-self:center}
+.featureinfo h3{font-size:26px;margin:0 0 12px}
+.featureinfo p{color:var(--muted);line-height:1.7;font-size:13px}
+.badge{display:inline-block;border:1px solid #2c6c79;color:var(--cyan);font-size:10px;padding:6px 9px;border-radius:20px;margin-bottom:14px}
+.garage-tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+#search{flex:1;min-width:150px;background:#111522;color:white;border:1px solid var(--line);padding:13px;border-radius:10px;outline:none}
+#search:focus{border-color:var(--cyan)}
+.filter{background:#111522;color:#c3cce0;border:1px solid var(--line);padding:11px 13px;border-radius:10px}
+.filter.active{color:var(--cyan);border-color:var(--cyan)}
+.garage{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.car{min-width:0;border:1px solid var(--line);background:#111522;border-radius:14px;overflow:hidden;transition:transform .15s,border-color .15s}
+.car:active{transform:scale(.98)}
+.car.selected{border-color:var(--cyan);box-shadow:0 0 0 1px #5cf6ff35}
+.carvisual{height:115px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.carvisual:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,#ffffff10,transparent 60%)}
+.carvisual:after{content:"";position:absolute;bottom:17px;left:10%;right:10%;height:2px;background:#ffffff35}
+.caremoji{font-size:55px;filter:drop-shadow(0 8px 5px #0008);position:relative;z-index:1}
+.carinfo{padding:12px}
+.carinfo strong{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.carinfo small{display:block;color:var(--muted);font-size:10px;margin:7px 0 10px}
+.selectcar{width:100%;padding:9px;border:1px solid #303950;border-radius:8px;background:#1a2131;color:#fff;font-size:11px}
+.car.selected .selectcar{background:var(--cyan);color:#081016;border-color:var(--cyan);font-weight:bold}
+#more{display:block;margin:20px auto 0;background:#151b29;color:var(--cyan);border:1px solid #34465b;padding:13px 22px;border-radius:10px}
+#empty{display:none;color:var(--muted);padding:20px}
+footer{padding:24px 4%;border-top:1px solid var(--line);color:#748097;font-size:12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#e8fdff;color:#081016;padding:13px 18px;border-radius:10px;font-size:13px;font-weight:bold;z-index:20;transition:.2s;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:850px){.sidebar{width:190px}main{margin-left:190px}.garage{grid-template-columns:repeat(2,minmax(0,1fr))}.feature{grid-template-columns:1fr}.featureart{min-height:155px}}
+@media(max-width:600px){
+.sidebar{width:245px;transform:translateX(-102%);transition:transform .2s;box-shadow:10px 0 30px #0007}
+.sidebar.open{transform:translateX(0)}
+main{margin-left:0}.menuToggle{display:block}.topbar{height:59px;padding:0 15px}
+.hero{padding:43px 20px 35px}.hero:after{right:-100px}.hero p{font-size:13px}
+.stats{padding:0 15px;gap:8px}.stat{padding:12px 9px}.stat strong{font-size:20px}.stat span{font-size:10px}
+.section{padding:30px 15px}.sectionhead{align-items:start;flex-direction:column}h2{font-size:23px}
+.featureart{min-height:145px;font-size:80px}.featureinfo{padding:20px}
+.garage{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.carvisual{height:95px}.caremoji{font-size:46px}.caremoji{font-size:47px}
+}
 </style>
 </head>
-
 <body>
-<header>
-  <div class="logo">🎮 ÇINAR GAMES</div>
-</header>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+  <div class="brand">✦ ÇINAR GAMES<small>RACING WORLD</small></div>
+  <div class="navtitle">ANA MENÜ</div>
+  <nav class="nav">
+    <button class="active" data-go="home">⌂　Ana Sayfa</button>
+    <button data-go="games">🎮　Oyunlar</button>
+    <button data-go="garage">🏎️　200 Araçlık Garaj</button>
+    <button data-go="about">✦　Hakkımızda</button>
+  </nav>
+  <div class="sidebottom">KENDİ DÜNYANI KUR<br>© 2026 Çınar Games</div>
+</aside>
 
-<section class="hero">
-  <small>OYNA · EĞLEN · KAZAN</small>
-  <h1>Oyun dünyana<br><span>hoş geldin!</span></h1>
-  <p>Çınar Games'e hoş geldin! Ücretsiz oyunlarını keşfet, yarışa katıl ve kendi rekorunu kır. İndirme yok, beklemek yok!</p>
-  <a class="button" href="#oyunlar">🎮 OYUNLARI KEŞFET</a>
-</section>
-
-<main id="oyunlar">
-  <h2>🔥 Oyunlarımız</h2>
-
-  <div class="card">
-    <div class="cover">🏎️</div>
-    <div class="info">
-      <h3>Çınar Racing</h3>
-      <p>Rakip araçlardan kaç, puan topla ve yeni arabaların kilidini aç. En yüksek puanını yapabilecek misin?</p>
-      <a class="play" href="./games/index.html">🏁 HEMEN OYNA</a>
-    </div>
+<main>
+  <div class="topbar">
+    <button class="menuToggle" id="menuToggle">☰ Menü</button>
+    <div class="status">● SİSTEM <span>ÇEVRİM İÇİ</span></div>
+    <div class="status">TÜRKİYE 🇹🇷</div>
   </div>
-</main>
 
-<footer>© 2026 Çınar Games · İyi eğlenceler! 🎮</footer>
+  <section class="hero" id="home">
+    <div class="eyebrow">YOUR GAME. YOUR WORLD.</div>
+    <h1>OYUNUNU<br><span>BAŞLAT.</span></h1>
+    <p>Çınar Games'e hoş geldin! Yarış pistine gir, garajını keşfet ve favori aracını seç. Macera burada başlıyor.</p>
+    <div class="actions">
+      <a class="primary" href="./games/index.html">🏁 YARIŞA BAŞLA</a>
+      <button class="secondary" data-go="garage">🏎️ GARAJI KEŞFET</button>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat"><strong>200</strong><span>GARAJ ARACI</span></div>
+    <div class="stat"><strong>01</strong><span>OYUN</span></div>
+    <div class="stat"><strong>FREE</strong><span>ÜCRETSİZ OYNA</span></div>
+  </div>
+
+  <section class="section" id="games">
+    <div class="sectionhead"><div><div class="kicker">OYUN MERKEZİ</div><h2>Öne Çıkan Oyun</h2></div><p>Bir dokunuşla oynamaya başla.</p></div>
+    <div class="feature">
+      <div class="featureart">🏎️</div>
+      <div class="featureinfo">
+        <span class="badge">YARIŞ · ARCADE</span>
+        <h3>Çınar Racing</h3>
+        <p>Trafikten kaç, puan topla ve kendi rekorunu kır. Telefonundan dokunmatik kontrollerle oyna!</p>
+        <a class="primary" href="./games/index.html">OYUNU AÇ　➜</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="garage">
+    <div class="sectionhead"><div><div class="kicker">ARACINI SEÇ</div><h2>🏎️ Dev Garaj</h2></div><p id="count">200 araç</p></div>
+    <div class="garage-tools">
+      <input id="search" type="search" placeholder="🔎 Araç ara..." aria-label="Araç ara">
+      <button class="filter active" data-filter="all">Tümü</button>
+      <button class="filter" data-filter="sport">Spor</button>
+      <button class="filter" data-filter="race">Yarış</button>
+      <button class="filter" data-filter="classic">Klasik</button>
+    </div>
+    <div class="garage" id="garageList"></div>
+    <div id="empty">Bu aramayla eşleşen araç bulunamadı.</div>
+    <button id="more">DAHA FAZLA ARAÇ GÖSTER ↓</button>
+  </section>
+
+  <section class="section" id="about">
+    <div class="kicker">HAKKIMIZDA</div>
+    <h2>Bu dünya Çınar Games!</h2>
+    <p style="color:#aeb8cc;line-height:1.8;max-width:650px">Çınar Games, tarayıcıdan oyun oynamak ve araç tasarımlarını keşfetmek için hazırlanmış kişisel oyun projesidir. Yeni oyunlar zamanla eklenebilir.</p>
+  </section>
+
+  <footer><span>© 2026 Çınar Games</span><span>Oyna. Keşfet. Tekrar oyna. ✦</span></footer>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const names=["Falcon","Vortex","Shadow","Blaze","Phantom","Nova","Storm","Venom","Raptor","Nitro","Turbo","Comet","Rogue","Titan","Pulse","Drift","Apex","Rocket","Fury","Legend"];
+const colors=["#f04452","#42cfff","#ffb52e","#b56bff","#56e39f","#f5f5f5","#ff6ac1","#e7eaff","#8da6ff","#f47738","#d4df45","#4bdbc4","#ff4d9d","#a5a5b5","#9c653f","#d9f0ff","#76e04d","#ffdf72","#5c77ff","#f5f5f5"];
+const types=["sport","race","classic"];
+const typeNames={sport:"Spor",race:"Yarış",classic:"Klasik"};
+let selected=Number(localStorage.getItem("cinarSelectedCar")||0);
+if(!Number.isFinite(selected)||selected<0||selected>=200)selected=0;
+let filter="all",visible=30;
+const cars=Array.from({length:200},(_,i)=>({
+id:i,name:names[i%names.length]+" "+String(i+1).padStart(3,"0"),
+color:colors[i%colors.length],type:types[i%3],
+emoji:i%3===2?"🚘":"🏎️",
+style:i%4
+}));
+function toast(message){
+const t=$("toast");t.textContent=message;t.classList.add("show");
+clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove("show"),2100);
+}
+function draw(){
+const query=$("search").value.trim().toLowerCase();
+const list=cars.filter(c=>(filter==="all"||c.type===filter)&&
+(c.name.toLowerCase().includes(query)||typeNames[c.type].toLowerCase().includes(query)));
+$("count").textContent=list.length+" araç";
+$("empty").style.display=list.length?"none":"block";
+const shown=list.slice(0,visible);
+$("garageList").innerHTML=shown.map(c=>`
+<div class="car ${selected===c.id?"selected":""}">
+  <div class="carvisual" style="background:radial-gradient(ellipse,${c.color}55,#111522 72%)">
+    <span class="caremoji" style="filter:drop-shadow(0 7px 5px #0008) hue-rotate(${c.style*13}deg)">${c.emoji}</span>
+  </div>
+  <div class="carinfo">
+    <strong>${c.name}</strong>
+    <small>${typeNames[c.type]} · Araç #${c.id+1}</small>
+    <button class="selectcar" data-car="${c.id}">${selected===c.id?"✓ SEÇİLDİ":"ARACI SEÇ"}</button>
+  </div>
+</div>`).join("");
+$("more").style.display=visible<list.length?"block":"none";
+}
+function go(id){
+const target=$(id);
+if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
+$("sidebar").classList.remove("open");
+document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+}
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+$("menuToggle").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
+document.querySelectorAll("[data-filter]").forEach(b=>b.addEventListener("click",()=>{
+filter=b.dataset.filter;visible=30;
+document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));
+draw();
+}));
+$("search").addEventListener("input",()=>{visible=30;draw()});
+$("more").addEventListener("click",()=>{visible+=30;draw()});
+$("garageList").addEventListener("click",e=>{
+const button=e.target.closest("[data-car]");
+if(!button)return;
+selected=Number(button.dataset.car);
+localStorage.setItem("cinarSelectedCar",String(selected));
+draw();
+toast(cars[selected].name+" garajında seçildi!");
+});
+draw();
+})();
+</script>
 </body>
 </html>
