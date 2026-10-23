@@ -3,827 +3,538 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Çınar Racing</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080b16">
+<meta name="description" content="Çınar Games - Ücretsiz oyunlarını keşfet ve hemen oyna!">
+<title>Çınar Games | Oyun Dünyası</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#10151d;color:white;font-family:Arial,sans-serif;overflow:hidden;touch-action:none}
-button,input,a{font:inherit}
-button{border:1px solid #ffffff40;background:#202b3a;color:white;border-radius:10px;padding:10px;font-weight:bold}
-button:active{background:#168cff}
-button:disabled{opacity:.4}
-#game{position:fixed;inset:0;width:100%;height:100%;display:block}
-#hud{position:fixed;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;z-index:20;pointer-events:none}
-.panel{background:#101722e8;border:1px solid #ffffff25;border-radius:12px;padding:8px 10px}
-#hud button,#hud a{pointer-events:auto;padding:9px;font-size:12px}
-#homeBtn{background:#087dff;color:#fff;text-decoration:none;border-radius:10px;border:1px solid #ffffff50;font-weight:bold;display:inline-block;position:relative;z-index:99999;pointer-events:auto}
-.small{font-size:12px;color:#cbd5e1}
-#pauseBtn{position:fixed;top:112px;left:10px;z-index:25;padding:10px 14px;background:#17202cef}
-#pauseBadge{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);background:#101722ed;border:2px solid #ffffff50;border-radius:16px;padding:18px 26px;font-size:24px;font-weight:bold;z-index:26;display:none;pointer-events:none}
-#controls{position:fixed;bottom:15px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:flex-end;gap:5px;z-index:4}
-.group{display:flex;gap:6px;align-items:flex-end}
-.ctrl{width:54px;height:58px;font-size:22px;padding:3px;touch-action:none}
-.pedal{width:56px;height:67px;font-size:12px;padding:3px;touch-action:none}
-#gas{background:#087d49}#brake{background:#8b2929}
-#exhaustToggle{position:fixed;top:76px;right:10px;width:90px;padding:7px 3px;font-size:11px;z-index:4}
-#exhaustMenu{position:fixed;left:10px;bottom:90px;width:170px;background:#101722f5;border:1px solid #ffffff35;border-radius:12px;padding:10px;display:none;z-index:5}
-#exhaustMenu.show{display:block}
-#exhaustMenu button{width:100%;margin-top:6px;font-size:12px}
-#overlay{position:fixed;inset:0;background:#070b11f5;display:none;overflow:auto;padding:18px;z-index:30}
-#overlay.show{display:block}
-#overlayHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
-#cars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:15px}
-.caritem{border:1px solid #ffffff28;background:#17202c;border-radius:12px;padding:10px;min-width:0}
-.caritem canvas{width:100%;height:65px}
-.caritem button{width:100%;margin-top:8px;font-size:12px}
-#toast{position:fixed;top:155px;left:50%;transform:translateX(-50%);background:#101722ef;border:1px solid #ffffff35;border-radius:12px;padding:10px 14px;display:none;z-index:40;text-align:center;max-width:90%;font-size:13px}
-#startScreen{position:fixed;inset:0;background:#07111ded;z-index:10;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
-.startbox{width:min(350px,100%);background:#17202cef;border:1px solid #ffffff30;border-radius:20px;padding:25px}
-.primary{background:#087dff;width:100%;margin-top:10px}
-@media(min-width:700px){#cars{grid-template-columns:repeat(4,minmax(0,1fr))}}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+:root{
+  --bg:#080b16;
+  --card:#121a2b;
+  --blue:#168cff;
+  --purple:#8b5cf6;
+  --white:#ffffff;
+  --muted:#aab5ca;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--white);
+  font-family:Arial,Helvetica,sans-serif;
+  overflow-x:hidden;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+button{
+  font:inherit;
+}
+
+.container{
+  width:min(1100px,92%);
+  margin:auto;
+}
+
+/* ÜST MENÜ */
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:#080b16ed;
+  border-bottom:1px solid #ffffff12;
+  backdrop-filter:blur(14px);
+}
+
+.navbar{
+  min-height:68px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.logo{
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:-.5px;
+}
+
+.logo span{
+  color:var(--blue);
+}
+
+.nav-links{
+  display:flex;
+  gap:20px;
+  align-items:center;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.nav-links a:hover{
+  color:white;
+}
+
+/* ANA BÖLÜM */
+.hero{
+  position:relative;
+  overflow:hidden;
+  text-align:center;
+  padding:85px 15px 75px;
+  background:
+    radial-gradient(ellipse at 50% 10%,#163d79 0%,transparent 55%),
+    linear-gradient(180deg,#0b1225,#080b16);
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  width:280px;
+  height:280px;
+  border-radius:50%;
+  background:#168cff15;
+  filter:blur(25px);
+  left:-100px;
+  bottom:-150px;
+}
+
+.hero-content{
+  position:relative;
+  max-width:720px;
+  margin:auto;
+}
+
+.tag{
+  display:inline-block;
+  padding:8px 13px;
+  border:1px solid #168cff65;
+  border-radius:30px;
+  color:#83c4ff;
+  background:#168cff12;
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:20px;
+}
+
+.hero h1{
+  font-size:clamp(38px,8vw,68px);
+  font-weight:900;
+  line-height:1.08;
+  letter-spacing:-2px;
+}
+
+.hero h1 span{
+  background:linear-gradient(90deg,#168cff,#a78bfa);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.hero p{
+  max-width:550px;
+  margin:20px auto 25px;
+  color:var(--muted);
+  line-height:1.7;
+  font-size:16px;
+}
+
+.main-button{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  padding:14px 23px;
+  border-radius:12px;
+  background:linear-gradient(100deg,#087dff,#6555ed);
+  color:white;
+  font-weight:800;
+  box-shadow:0 8px 28px #168cff30;
+  transition:transform .2s,filter .2s;
+}
+
+.main-button:hover{
+  transform:translateY(-3px);
+  filter:brightness(1.12);
+}
+
+/* OYUNLAR */
+.games-section{
+  padding:45px 0 65px;
+  scroll-margin-top:85px;
+}
+
+.section-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  gap:12px;
+  margin-bottom:24px;
+}
+
+.section-heading h2{
+  font-size:27px;
+  margin-bottom:8px;
+}
+
+.section-heading p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.5;
+}
+
+.game-count{
+  color:#9bcfff;
+  background:#168cff18;
+  border:1px solid #168cff35;
+  border-radius:10px;
+  padding:8px 10px;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:20px;
+}
+
+.game-card{
+  min-width:0;
+  overflow:hidden;
+  border:1px solid #ffffff17;
+  background:linear-gradient(160deg,#151e32,#101624);
+  border-radius:18px;
+  transition:transform .2s,border-color .2s;
+}
+
+.game-card:hover{
+  transform:translateY(-5px);
+  border-color:#168cff80;
+}
+
+.game-art{
+  min-height:180px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 100%,#168cff45,transparent 65%),
+    linear-gradient(135deg,#142c50,#111629);
+}
+
+.game-art .emoji{
+  font-size:85px;
+  filter:drop-shadow(0 10px 15px #0008);
+  transition:transform .25s;
+}
+
+.game-card:hover .emoji{
+  transform:scale(1.08);
+}
+
+.game-number{
+  position:absolute;
+  top:12px;
+  left:12px;
+  padding:6px 9px;
+  border-radius:8px;
+  background:#080b16bd;
+  border:1px solid #ffffff20;
+  font-size:11px;
+  color:#dce8ff;
+}
+
+.game-info{
+  padding:18px;
+}
+
+.game-info h3{
+  font-size:20px;
+  margin-bottom:9px;
+}
+
+.game-info p{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.65;
+  min-height:42px;
+  margin-bottom:15px;
+}
+
+.game-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:16px;
+}
+
+.game-tags span{
+  font-size:11px;
+  padding:6px 8px;
+  border-radius:7px;
+  background:#ffffff0b;
+  color:#c8d5e9;
+  border:1px solid #ffffff12;
+}
+
+.play-button{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  width:100%;
+  border:0;
+  border-radius:10px;
+  padding:13px;
+  background:var(--blue);
+  color:white;
+  font-size:14px;
+  font-weight:800;
+  transition:background .2s;
+}
+
+.play-button:hover{
+  background:#006de0;
+}
+
+/* BİLGİ BÖLÜMÜ */
+.about{
+  padding:35px 0 60px;
+}
+
+.about-box{
+  border:1px solid #ffffff14;
+  border-radius:18px;
+  background:linear-gradient(120deg,#121b2e,#101321);
+  padding:28px;
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+
+.about-icon{
+  font-size:45px;
+  flex-shrink:0;
+}
+
+.about-box h2{
+  font-size:22px;
+  margin-bottom:9px;
+}
+
+.about-box p{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+}
+
+/* ALT MENÜ */
+footer{
+  border-top:1px solid #ffffff12;
+  padding:25px 0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.footer-content{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+
+.footer-logo{
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+}
+
+@media(max-width:760px){
+  .games-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+
+  .game-art{
+    min-height:135px;
+  }
+
+  .game-art .emoji{
+    font-size:65px;
+  }
+
+  .game-info{
+    padding:13px;
+  }
+
+  .game-info h3{
+    font-size:17px;
+  }
+
+  .game-info p{
+    font-size:12px;
+    min-height:58px;
+  }
+
+  .section-heading h2{
+    font-size:23px;
+  }
+
+  .hero{
+    padding:65px 12px 60px;
+  }
+}
+
+@media(max-width:380px){
+  .games-grid{
+    grid-template-columns:1fr;
+  }
+
+  .game-art{
+    min-height:170px;
+  }
+
+  .game-info p{
+    min-height:0;
+  }
+
+  .nav-links{
+    gap:10px;
+    font-size:12px;
+  }
+
+  .logo{
+    font-size:19px;
+  }
+}
 </style>
 </head>
+
 <body>
 
-<canvas id="game"></canvas>
+<header>
+  <div class="container navbar">
+    <a class="logo" href="./">🎮 ÇINAR<span> GAMES</span></a>
 
-<div id="hud">
- <div class="panel">
-  <b>🏁 ÇINAR RACING</b><br>
-  <span class="small">Skor: <b id="score">0</b></span><br>
-  <span class="small">Hız: <b id="speed">0</b> km/s</span>
- </div>
- <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">
-  <a id="homeBtn" href="https://iergk.github.io/Cinar-Games/" target="_self">⌂ Ana site</a>
-  <button id="garageBtn">🚘 Garaj</button>
-  <button id="soundBtn">🔊 Motor</button>
- </div>
-</div>
-
-<button id="pauseBtn">⏸ DURDUR</button>
-<div id="pauseBadge">⏸ DURAKLATILDI</div>
-
-<button id="exhaustToggle">💨 Egzoz AÇIK</button>
-
-<div id="controls">
- <div class="group">
-  <button class="ctrl" id="left">◀</button>
-  <button class="ctrl" id="right">▶</button>
- </div>
- <div class="group">
-  <button class="ctrl" id="exhaustBtn">💨</button>
- </div>
- <div class="group">
-  <button class="pedal" id="brake">FREN</button>
-  <button class="pedal" id="gas">GAZ</button>
- </div>
-</div>
-
-<div id="exhaustMenu">
- <b>💨 Egzoz Garajı</b>
- <p class="small" id="exhaustInfo"></p>
- <div id="exhaustOptions"></div>
- <button id="closeExhaust">Kapat</button>
-</div>
-
-<div id="overlay">
- <div id="overlayHead">
-  <div>
-   <h2 style="margin:0">🚘 Araba Garajı</h2>
-   <span class="small">500 araba • Puanla araç aç</span>
+    <nav class="nav-links">
+      <a href="./">Ana Sayfa</a>
+      <a href="#games">Oyunlar</a>
+      <a href="#about">Hakkımızda</a>
+    </nav>
   </div>
-  <button id="closeGarage">✕</button>
- </div>
- <p>En iyi skor: <b id="bestScore">0</b></p>
- <input id="search" placeholder="Araba ara..." style="width:100%;padding:12px;border-radius:10px;border:1px solid #ffffff40;background:#17202c;color:white">
- <div id="cars"></div>
-</div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="tag">🎮 ÇINAR GAMES'E HOŞ GELDİN</div>
+
+      <h1>
+        OYUN DÜNYANA<br>
+        <span>HOŞ GELDİN!</span>
+      </h1>
+
+      <p>
+        Kendi oyun dünyanı keşfet! Çınar Games'te oyunlarını aç,
+        yarışlara katıl ve eğlenceye hemen başla.
+        Üstelik telefonundan da oynayabilirsin.
+      </p>
+
+      <a class="main-button" href="#games">
+        🎮 OYUNLARI KEŞFET
+      </a>
+    </div>
+  </section>
+
+  <section class="games-section container" id="games">
+    <div class="section-heading">
+      <div>
+        <h2>🎮 Oyunlarımız</h2>
+        <p>Bir oyun seç ve maceraya başla!</p>
+      </div>
+
+      <span class="game-count">🏁 Oynamaya hazır</span>
+    </div>
+
+    <div class="games-grid">
+
+      <!-- ÇINAR RACING -->
+      <article class="game-card">
+        <a href="./games/index.html" aria-label="Çınar Racing oyununu aç">
+          <div class="game-art">
+            <span class="game-number">01 • YARIŞ</span>
+            <span class="emoji">🏎️</span>
+          </div>
+        </a>
+
+        <div class="game-info">
+          <h3>Çınar Racing</h3>
+
+          <p>
+            Dört şeritli yolda yarış! Rakip araçları geç,
+            hızlan, skor topla ve yeni arabaların kilidini aç.
+          </p>
+
+          <div class="game-tags">
+            <span>🏎️ Araba</span>
+            <span>📱 Dokunmatik</span>
+            <span>🏆 Skor</span>
+          </div>
+
+          <a class="play-button" href="./games/index.html">
+            ▶ OYNA
+          </a>
+        </div>
+      </article>
+
+      <!-- YENİ OYUNLAR İÇİN KARTLAR BURAYA EKLENEBİLİR -->
+
+    </div>
+  </section>
+
+  <section class="about container" id="about">
+    <div class="about-box">
+      <div class="about-icon">🚀</div>
+
+      <div>
+        <h2>Çınar Games nedir?</h2>
+        <p>
+          Çınar Games, oyunları kolayca keşfedebileceğin
+          kişisel oyun platformudur. Yeni oyunlar eklendikçe
+          bu sayfadan onlara ulaşabilirsin.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container footer-content">
+    <a class="footer-logo" href="./">🎮 ÇINAR GAMES</a>
+
+    <span>© 2026 Çınar Games • İyi eğlenceler!</span>
+  </div>
+</footer>
 
-<div id="startScreen">
- <div class="startbox">
-  <h1>🏎️ ÇINAR RACING</h1>
-  <p id="startText">Uzun yolda yarış, skor topla, yeni arabalar ve egzozlar aç!</p>
-  <button class="primary" id="startBtn">OYUNA BAŞLA</button>
-  <button class="primary" id="startGarage">GARAJ</button>
-  <p class="small">Sol ve sağ ile yön ver • Gazla hızlan</p>
- </div>
-</div>
-
-<div id="toast"></div>
-
-<script>
-"use strict";
-
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
-const $=id=>document.getElementById(id);
-
-let W=innerWidth,H=innerHeight,dpr=1;
-
-function resize(){
- W=innerWidth;
- H=innerHeight;
- dpr=Math.min(devicePixelRatio||1,2);
- canvas.width=Math.round(W*dpr);
- canvas.height=Math.round(H*dpr);
- ctx.setTransform(dpr,0,0,dpr,0,0);
-}
-addEventListener("resize",resize);
-resize();
-
-let running=false;
-let gameOver=false;
-let paused=false;
-let score=0;
-let best=0;
-let speed=0;
-let steer=0;
-
-let gasDown=false;
-let brakeDown=false;
-let leftDown=false;
-let rightDown=false;
-
-let roadScroll=0;
-let spawnTimer=0;
-let last=0;
-let enemies=[];
-let selectedCar=0;
-let exhaustOn=true;
-let selectedExhaust=0;
-
-let audioCtx=null;
-let osc=null;
-let osc2=null;
-let gain=null;
-let audioOn=true;
-let lastGear=1;
-let shiftTimer=0;
-
-try{
- best=Number(localStorage.getItem("cinarBest")||0);
- selectedCar=Number(localStorage.getItem("cinarCar")||0);
- selectedExhaust=Number(localStorage.getItem("cinarExhaust")||0);
- audioOn=localStorage.getItem("cinarSound")!=="off";
- exhaustOn=localStorage.getItem("cinarExhaustOn")!=="off";
-}catch(e){}
-
-const carColors=[
- "#ff3030","#18a7ff","#f4d03f","#eeeeee",
- "#b45cff","#22df8c","#ff7b24","#ff4fd8"
-];
-
-const carNames=[
- "Başlangıç","Street GT","Turbo X","Night Rider",
- "Storm","Phantom","Vortex","Legend","Racer Pro","Hyper GT"
-];
-
-const exhaustNames=[
- "Standart","Mavi Alev","Turuncu Alev",
- "Mor Alev","Neon Alev","Çift Patlama"
-];
-
-const exhaustColors=[
- "#ffad32","#28d8ff","#ff6b22",
- "#d45bff","#65ffef","#ff3e3e"
-];
-
-function carName(i){
- return carNames[i]||"Racer "+(i+1);
-}
-
-function carColor(i){
- return carColors[i%carColors.length];
-}
-
-function carPrice(i){
- return i===0?0:i*500;
-}
-
-function money(n){
- return Math.floor(n).toLocaleString("tr-TR");
-}
-
-function unlockedExhausts(){
- return Math.min(exhaustNames.length,1+Math.floor(best/5000));
-}
-
-function isUnlocked(i){
- return i===0||best>=carPrice(i);
-}
-
-function toast(t){
- $("toast").textContent=t;
- $("toast").style.display="block";
- clearTimeout(toast.timer);
- toast.timer=setTimeout(()=>$("toast").style.display="none",2200);
-}
-
-function saveProgress(){
- try{
-  localStorage.setItem("cinarBest",String(best));
-  localStorage.setItem("cinarCar",String(selectedCar));
-  localStorage.setItem("cinarExhaust",String(selectedExhaust));
-  localStorage.setItem("cinarSound",audioOn?"on":"off");
-  localStorage.setItem("cinarExhaustOn",exhaustOn?"on":"off");
- }catch(e){}
-}
-
-function initAudio(){
- if(!audioOn)return;
-
- try{
-  if(!audioCtx){
-   audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-
-   osc=audioCtx.createOscillator();
-   osc.type="sawtooth";
-
-   osc2=audioCtx.createOscillator();
-   osc2.type="triangle";
-
-   const filter=audioCtx.createBiquadFilter();
-   filter.type="lowpass";
-   filter.frequency.value=900;
-
-   gain=audioCtx.createGain();
-
-   osc.connect(filter);
-   osc2.connect(filter);
-   filter.connect(gain);
-   gain.connect(audioCtx.destination);
-
-   osc.frequency.value=55;
-   osc2.frequency.value=27;
-   gain.gain.value=0;
-
-   osc.start();
-   osc2.start();
-  }
-
-  if(audioCtx.state==="suspended")audioCtx.resume();
- }catch(e){}
-}
-
-function updateAudio(dt){
- if(!audioCtx||!audioOn||!gain)return;
-
- const t=audioCtx.currentTime;
- const rpm=45+speed*1.35+(gasDown?35:0);
- const g=Math.max(1,Math.min(6,Math.floor(speed/27)+1));
-
- if(g!==lastGear){
-  lastGear=g;
-  shiftTimer=180;
- }
-
- shiftTimer=Math.max(0,shiftTimer-dt);
- const dip=shiftTimer>0?.68:1;
-
- osc.frequency.setTargetAtTime(Math.max(35,rpm*dip),t,.07);
- osc2.frequency.setTargetAtTime(Math.max(20,rpm*.48*dip),t,.09);
- gain.gain.setTargetAtTime(running&&!gameOver&&!paused?(gasDown?.075:.035):0,t,.12);
-}
-
-function funnyLaugh(){
- if(!audioOn)return;
- initAudio();
- if(!audioCtx)return;
-
- [260,360,290,420,230,340,280,390].forEach((freq,i)=>{
-  const start=audioCtx.currentTime+i*.14;
-  const o=audioCtx.createOscillator();
-  const g=audioCtx.createGain();
-
-  o.type="triangle";
-  o.frequency.setValueAtTime(freq,start);
-  o.frequency.exponentialRampToValueAtTime(freq*.68,start+.11);
-
-  g.gain.setValueAtTime(.001,start);
-  g.gain.linearRampToValueAtTime(.10,start+.02);
-  g.gain.exponentialRampToValueAtTime(.001,start+.13);
-
-  o.connect(g);
-  g.connect(audioCtx.destination);
-  o.start(start);
-  o.stop(start+.14);
- });
-}
-
-$("soundBtn").textContent=audioOn?"🔊 Motor":"🔇 Motor";
-
-$("soundBtn").onclick=()=>{
- audioOn=!audioOn;
- $("soundBtn").textContent=audioOn?"🔊 Motor":"🔇 Motor";
-
- if(!audioOn&&gain&&audioCtx){
-  gain.gain.setTargetAtTime(0,audioCtx.currentTime,.05);
- }
-
- if(audioOn)initAudio();
- saveProgress();
-};
-
-function road(y){
- const top=H*.13;
- const bottom=H*1.05;
- const p=Math.max(0,Math.min(1,(y-top)/(bottom-top)));
-
- return {
-  center:W*.5,
-  half:W*(.105+p*.40),
-  p
- };
-}
-
-function drawRoad(){
- const sky=ctx.createLinearGradient(0,0,0,H);
-
- sky.addColorStop(0,"#75c7f4");
- sky.addColorStop(.45,"#d8efff");
- sky.addColorStop(.46,"#40874a");
- sky.addColorStop(1,"#235b31");
-
- ctx.fillStyle=sky;
- ctx.fillRect(0,0,W,H);
-
- ctx.fillStyle="#397c4b";
- ctx.beginPath();
- ctx.moveTo(0,H*.48);
- ctx.lineTo(W*.15,H*.32);
- ctx.lineTo(W*.3,H*.47);
- ctx.lineTo(W*.5,H*.34);
- ctx.lineTo(W*.72,H*.48);
- ctx.lineTo(W*.88,H*.35);
- ctx.lineTo(W,H*.48);
- ctx.lineTo(W,H);
- ctx.lineTo(0,H);
- ctx.fill();
-
- const top=H*.13;
- const bottom=H*1.05;
- const a=road(top);
- const b=road(bottom);
-
- ctx.fillStyle="#343940";
- ctx.beginPath();
- ctx.moveTo(a.center-a.half,top);
- ctx.lineTo(a.center+a.half,top);
- ctx.lineTo(b.center+b.half,bottom);
- ctx.lineTo(b.center-b.half,bottom);
- ctx.closePath();
- ctx.fill();
-
- ctx.strokeStyle="#f5f5f5";
- ctx.lineWidth=2;
-
- for(const side of [-1,1]){
-  ctx.beginPath();
-  ctx.moveTo(a.center+side*a.half,top);
-  ctx.lineTo(b.center+side*b.half,bottom);
-  ctx.stroke();
- }
-
- // Dört şerit için üç kesikli çizgi
- for(let lane=1;lane<=3;lane++){
-  for(let y=top+(roadScroll%75)-75;y<H+80;y+=75){
-   if(y<top)continue;
-
-   const r=road(y);
-   const x=r.center-r.half+2*r.half*lane/4;
-
-   ctx.fillStyle="#eee8ca";
-   ctx.fillRect(
-    x-(1.5+r.p*2.5)/2,
-    y,
-    1.5+r.p*2.5,
-    10+r.p*35
-   );
-  }
- }
-}
-
-function drawCar(x,y,w,h,color,isPlayer=false){
- ctx.save();
- ctx.translate(x,y);
-
- ctx.fillStyle="#080a0d";
- ctx.beginPath();
- ctx.roundRect(-w*.53,-h*.47,w*1.06,h*.96,w*.17);
- ctx.fill();
-
- ctx.fillStyle=color;
- ctx.beginPath();
- ctx.roundRect(-w*.45,-h*.48,w*.9,h*.94,w*.17);
- ctx.fill();
-
- ctx.fillStyle="#182532";
- ctx.beginPath();
- ctx.roundRect(-w*.31,-h*.26,w*.62,h*.26,w*.07);
- ctx.fill();
-
- ctx.fillStyle="#090a0c";
- ctx.fillRect(-w*.53,-h*.23,w*.13,h*.25);
- ctx.fillRect(w*.40,-h*.23,w*.13,h*.25);
- ctx.fillRect(-w*.53,h*.18,w*.13,h*.24);
- ctx.fillRect(w*.40,h*.18,w*.13,h*.24);
-
- ctx.fillStyle="#ff1717";
- ctx.fillRect(-w*.41,h*.28,w*.24,h*.12);
- ctx.fillRect(w*.17,h*.28,w*.24,h*.12);
-
- ctx.fillStyle="#e5e7eb";
- ctx.fillRect(-w*.17,h*.36,w*.34,h*.045);
-
- ctx.fillStyle="#111318";
- ctx.fillRect(-w*.4,h*.43,w*.8,h*.06);
-
- if(isPlayer&&exhaustOn){
-  ctx.fillStyle=exhaustColors[selectedExhaust%exhaustColors.length];
-  ctx.globalAlpha=.9;
-
-  const flicker=gasDown?Math.random()*h*.14:0;
-
-  for(const side of [-1,1]){
-   ctx.beginPath();
-   ctx.moveTo(side*w*.12,h*.46);
-   ctx.lineTo(side*w*.22,h*.46);
-   ctx.lineTo(side*w*.17,h*.54+flicker);
-   ctx.closePath();
-   ctx.fill();
-  }
- }
-
- ctx.restore();
-}
-
-function playerPos(){
- const b=road(H*.76);
-
- return {
-  // Daha geniş hareket alanı: yolun iki kenarına yaklaşabilir
-  x:b.center+steer*b.half*.88,
-  y:H*.76,
-  w:Math.max(42,W*.105),
-  h:Math.max(70,H*.145)
- };
-}
-
-function spawnEnemy(){
- const y=H*.13+3;
- const lane=Math.floor(Math.random()*4);
- const b=road(y);
-
- // Dört şeridin ortasına rakip araç koy
- const x=b.center-b.half+2*b.half*(lane+.5)/4;
-
- enemies.push({
-  lane,
-  y,
-  x,
-  color:carColor(Math.floor(Math.random()*carColors.length))
- });
-}
-
-function update(dt){
- if(!running||gameOver||paused)return;
-
- if(gasDown)speed=Math.min(170,speed+dt*.045);
- else speed=Math.max(40,speed-dt*.018);
-
- if(brakeDown)speed=Math.max(0,speed-dt*.12);
-
- // Tam sola ve tam sağa yönlendirme
- if(leftDown)steer=Math.max(-.88,steer-dt*.002);
- if(rightDown)steer=Math.min(.88,steer+dt*.002);
-
- roadScroll+=speed*dt*.06;
-
- // Skor daha hızlı artar
- score+=speed*dt*.00012;
-
- $("score").textContent=money(score);
- $("speed").textContent=Math.round(speed);
-
- spawnTimer+=dt;
-
- if(spawnTimer>Math.max(650,1650-speed*4)){
-  spawnTimer=0;
-  spawnEnemy();
- }
-
- const p=playerPos();
-
- for(const e of enemies){
-  e.y+=dt*(.12+speed*.002);
-
-  const b=road(e.y);
-  e.x=b.center-b.half+2*b.half*(e.lane+.5)/4;
-
-  const scale=.28+b.p*.9;
-  e.w=Math.max(20,W*.065)*scale*2;
-  e.h=Math.max(34,H*.075)*scale*2;
-
-  if(
-   Math.abs(e.y-p.y)<(p.h+e.h)*.42&&
-   Math.abs(e.x-p.x)<(p.w+e.w)*.36
-  ){
-   endGame();
-   return;
-  }
- }
-
- enemies=enemies.filter(e=>e.y<H+150);
- updateAudio(dt);
-}
-
-function render(){
- ctx.clearRect(0,0,W,H);
- drawRoad();
-
- for(const e of enemies){
-  const b=road(e.y);
-  const scale=.28+b.p*.9;
-
-  drawCar(
-   e.x,e.y,
-   Math.max(20,W*.065)*scale*2,
-   Math.max(34,H*.075)*scale*2,
-   e.color
-  );
- }
-
- const p=playerPos();
- drawCar(p.x,p.y,p.w,p.h,carColor(selectedCar),true);
-}
-
-function loop(t){
- const dt=Math.min(40,t-(last||t));
- last=t;
-
- update(dt);
- render();
-
- requestAnimationFrame(loop);
-}
-
-requestAnimationFrame(loop);
-
-function startGame(){
- initAudio();
-
- score=0;
- speed=0;
- steer=0;
- enemies=[];
- spawnTimer=0;
- gameOver=false;
- running=true;
- paused=false;
-
- $("pauseBtn").textContent="⏸ DURDUR";
- $("pauseBadge").style.display="none";
- $("startScreen").style.display="none";
- $("startScreen").querySelector("h1").textContent="🏎️ ÇINAR RACING";
- $("startBtn").textContent="OYUNA BAŞLA";
- $("startText").textContent="Yarış, skor topla, yeni arabalar ve egzozlar aç!";
-}
-
-function endGame(){
- if(gameOver)return;
-
- gameOver=true;
- running=false;
- paused=false;
-
- $("pauseBadge").style.display="none";
- $("pauseBtn").textContent="⏸ DURDUR";
-
- best=Math.max(best,Math.floor(score));
- saveProgress();
-
- $("bestScore").textContent=money(best);
-
- if(gain&&audioCtx){
-  gain.gain.setTargetAtTime(0,audioCtx.currentTime,.08);
- }
-
- funnyLaugh();
-
- $("startScreen").style.display="flex";
- $("startScreen").querySelector("h1").textContent="🏁 OYUN BİTTİ";
- $("startText").textContent="Skorun: "+money(score)+" • En iyi: "+money(best);
- $("startBtn").textContent="TEKRAR OYNA";
-
- drawExhausts();
-}
-
-$("startBtn").onclick=startGame;
-$("startGarage").onclick=openGarage;
-$("garageBtn").onclick=openGarage;
-
-$("closeGarage").onclick=()=>{
- $("overlay").classList.remove("show");
-};
-
-function openGarage(){
- $("overlay").classList.add("show");
- $("bestScore").textContent=money(best);
- drawCars($("search").value);
-}
-
-$("search").addEventListener("input",()=>{
- drawCars($("search").value);
-});
-
-function drawCars(query=""){
- const list=$("cars");
- list.innerHTML="";
-
- const q=query.toLowerCase().trim();
-
- for(let i=0;i<500;i++){
-  const name=carName(i);
-
-  if(q&&!name.toLowerCase().includes(q)&&!String(i+1).includes(q)){
-   continue;
-  }
-
-  const price=carPrice(i);
-  const owned=isUnlocked(i);
-
-  const item=document.createElement("div");
-  item.className="caritem";
-
-  const cv=document.createElement("canvas");
-  cv.width=220;
-  cv.height=80;
-
-  const c=cv.getContext("2d");
-  c.fillStyle="#111923";
-  c.fillRect(0,0,220,80);
-
-  c.fillStyle=carColor(i);
-  c.beginPath();
-  c.roundRect(83,8,54,64,10);
-  c.fill();
-
-  c.fillStyle="#1a2938";
-  c.fillRect(91,23,38,18);
-
-  c.fillStyle="#ff3333";
-  c.fillRect(88,59,11,5);
-  c.fillRect(121,59,11,5);
-
-  const title=document.createElement("b");
-  title.textContent=(i+1)+". "+name;
-
-  const info=document.createElement("div");
-  info.className="small";
-  info.textContent=owned
-   ?(i===selectedCar?"Seçili araba":"Açık")
-   :"Gerekli skor: "+money(price);
-
-  const btn=document.createElement("button");
-
-  btn.textContent=i===selectedCar
-   ?"SEÇİLİ"
-   :owned
-    ?"ARABAYI SEÇ"
-    :"🔒 "+money(price)+" puan";
-
-  btn.disabled=i===selectedCar||!owned;
-
-  btn.onclick=()=>{
-   selectedCar=i;
-   saveProgress();
-   drawCars($("search").value);
-   toast(name+" seçildi!");
-  };
-
-  item.append(cv,title,info,btn);
-  list.append(item);
- }
-}
-
-function drawExhausts(){
- const list=$("exhaustOptions");
- list.innerHTML="";
-
- const count=unlockedExhausts();
-
- $("exhaustInfo").textContent=
-  "Açık: "+count+"/"+exhaustNames.length+" • Her 5.000 skor";
-
- exhaustNames.forEach((name,i)=>{
-  const b=document.createElement("button");
-
-  b.textContent=i===selectedExhaust
-   ?"✓ "+name
-   :(i<count?name+" — SEÇ":"🔒 "+name+" — "+money(i*5000)+" puan");
-
-  b.disabled=i>=count;
-
-  b.onclick=()=>{
-   selectedExhaust=i;
-   saveProgress();
-   drawExhausts();
-   toast(name+" seçildi!");
-  };
-
-  list.append(b);
- });
-}
-
-$("exhaustBtn").onclick=()=>{
- $("exhaustMenu").classList.toggle("show");
- drawExhausts();
-};
-
-$("closeExhaust").onclick=()=>{
- $("exhaustMenu").classList.remove("show");
-};
-
-$("exhaustToggle").onclick=()=>{
- exhaustOn=!exhaustOn;
-
- $("exhaustToggle").textContent=
-  exhaustOn?"💨 Egzoz AÇIK":"💨 Egzoz KAPALI";
-
- saveProgress();
- toast(exhaustOn?"Egzoz açıldı":"Egzoz kapandı");
-};
-
-$("exhaustToggle").textContent=
- exhaustOn?"💨 Egzoz AÇIK":"💨 Egzoz KAPALI";
-
-// DURDUR / DEVAM ET
-$("pauseBtn").onclick=()=>{
- if(!running||gameOver)return;
-
- paused=!paused;
-
- $("pauseBtn").textContent=
-  paused?"▶ DEVAM ET":"⏸ DURDUR";
-
- $("pauseBadge").style.display=paused?"block":"none";
-
- if(paused){
-  gasDown=false;
-  brakeDown=false;
-  leftDown=false;
-  rightDown=false;
-
-  if(gain&&audioCtx){
-   gain.gain.setTargetAtTime(0,audioCtx.currentTime,.05);
-  }
- }else{
-  last=performance.now();
-  initAudio();
- }
-};
-
-function holdButton(id,setter){
- const el=$(id);
-
- const down=e=>{
-  e.preventDefault();
-  if(paused||!running)return;
-  initAudio();
-  setter(true);
- };
-
- const up=e=>{
-  e.preventDefault();
-  setter(false);
- };
-
- el.addEventListener("pointerdown",down);
- el.addEventListener("pointerup",up);
- el.addEventListener("pointercancel",up);
- el.addEventListener("pointerleave",up);
-}
-
-holdButton("gas",v=>gasDown=v);
-holdButton("brake",v=>brakeDown=v);
-holdButton("left",v=>leftDown=v);
-holdButton("right",v=>rightDown=v);
-
-addEventListener("keydown",e=>{
- if(e.key==="ArrowLeft"||e.key==="a")leftDown=true;
- if(e.key==="ArrowRight"||e.key==="d")rightDown=true;
- if(e.key==="ArrowUp"||e.key==="w")gasDown=true;
- if(e.key==="ArrowDown"||e.key==="s")brakeDown=true;
-});
-
-addEventListener("keyup",e=>{
- if(e.key==="ArrowLeft"||e.key==="a")leftDown=false;
- if(e.key==="ArrowRight"||e.key==="d")rightDown=false;
- if(e.key==="ArrowUp"||e.key==="w")gasDown=false;
- if(e.key==="ArrowDown"||e.key==="s")brakeDown=false;
-});
-
-drawExhausts();
-</script>
 </body>
 </html>
