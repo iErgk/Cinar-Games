@@ -3,416 +3,479 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>KARANLIK: Kaçış</title>
 <style>
-*{box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#030303;color:white;font-family:monospace;touch-action:none}
-canvas{width:100vw;height:100dvh;display:block;touch-action:none}
-#hud{position:fixed;top:7px;left:6px;right:6px;display:flex;justify-content:space-between;gap:4px;pointer-events:none;font-size:10px}
-.pill{background:#080808e8;border:1px solid #a22;padding:7px 5px;border-radius:6px}
-#task{position:fixed;top:40px;left:7px;background:#090909d9;border:1px solid #633;padding:7px;font-size:11px;line-height:1.6;pointer-events:none}
-#msg{position:fixed;top:117px;left:5px;right:5px;text-align:center;color:#ff3737;text-shadow:0 0 10px red;font-weight:bold;pointer-events:none;font-size:12px}
-#controls{position:fixed;bottom:max(12px,env(safe-area-inset-bottom));left:0;right:0;display:flex;justify-content:space-between;align-items:end;padding:0 12px;pointer-events:none}
-.pad{display:grid;grid-template-columns:44px 44px 44px;grid-template-rows:44px 44px 44px;gap:3px;pointer-events:auto}
-button{color:white;background:#171717e8;border:2px solid #8b3333;border-radius:11px;font:bold 20px monospace;touch-action:none}
-.pad button{width:44px;height:44px;padding:0}
-.up{grid-column:2;grid-row:1}.left{grid-column:1;grid-row:2}.right{grid-column:3;grid-row:2}.down{grid-column:2;grid-row:3}
-.actions{display:flex;flex-direction:column;gap:7px;align-items:center;pointer-events:auto}
-.actions button{width:56px;height:56px;padding:0}
-#run{width:68px;height:68px;border-radius:50%}
-#menu{position:fixed;inset:0;z-index:5;background:#000e;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px}
-h1{color:#f22;font-size:clamp(35px,9vw,60px);text-shadow:0 0 25px red;margin:0}
-p{color:#ccc;line-height:1.5;max-width:350px}
-#start{padding:14px 26px;background:#8d1010;font-size:18px}
-#scare{display:none;position:fixed;z-index:4;inset:0;background:#100000;align-items:center;justify-content:center;overflow:hidden}
-#scare canvas{width:100%;height:100%}
-#scareText{position:absolute;bottom:15%;font-size:clamp(28px,9vw,65px);font-weight:bold;color:red;text-shadow:0 0 20px red}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#050607;color:#eee;font-family:Arial,sans-serif;overflow:hidden;touch-action:none}
+#game{display:block;width:100vw;height:100dvh;background:#090b0c;touch-action:none}
+#hud{position:fixed;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;gap:5px;pointer-events:none;z-index:3}
+.pill{background:#101313dd;border:1px solid #4b5350;padding:8px;border-radius:9px;font-size:12px}
+#message{position:fixed;top:20%;left:50%;transform:translateX(-50%);width:85%;text-align:center;color:#ff4747;text-shadow:0 0 12px red;font-size:20px;font-weight:bold;pointer-events:none;z-index:5}
+#menu{position:fixed;inset:0;background:radial-gradient(#18201d,#020303 75%);z-index:10;display:flex;align-items:center;justify-content:center;text-align:center;padding:22px}
+.panel{width:min(390px,100%);padding:22px;border:1px solid #46504b;border-radius:18px;background:#080b0bea;box-shadow:0 0 35px #101b16}
+h1{color:#b6c6bb;letter-spacing:6px;text-shadow:0 0 20px #a00;font-size:35px}
+button{color:white;background:#171d1a;border:1px solid #64716a;border-radius:10px;padding:12px 15px;font-weight:bold;font-size:14px;touch-action:manipulation}
+button:active{background:#38443c}
+.main{width:100%;margin:5px 0;background:#25382c}
+.small{font-size:12px;color:#9ca7a0;line-height:1.5}
+#controls{position:fixed;bottom:18px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-end;z-index:4;pointer-events:none}
+#pad{display:grid;grid-template-columns:48px 48px 48px;grid-template-rows:48px 48px 48px;gap:3px;pointer-events:auto}
+#pad button{padding:0;font-size:21px;background:#17201dcc;border-color:#69776eaa}
+#up{grid-column:2;grid-row:1}#left{grid-column:1;grid-row:2}#down{grid-column:2;grid-row:2}#right{grid-column:3;grid-row:2}
+#actions{display:flex;flex-direction:column;gap:7px;align-items:flex-end;pointer-events:auto}
+#actions button{min-width:80px;padding:12px 8px;background:#161c19dd}
+#run{background:#392323dd!important}
+#inventory{position:fixed;bottom:5px;left:50%;transform:translateX(-50%);font-size:11px;color:#aeb8b0;z-index:2;white-space:nowrap;pointer-events:none}
+.hidden{display:none!important}
+#flash{position:fixed;inset:0;background:#f00;opacity:0;pointer-events:none;z-index:8}
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
+
 <div id="hud">
- <div class="pill" id="hp">❤️ CAN: 3</div>
- <div class="pill" id="keysHud">🗝 ANAHTAR: 0/2</div>
- <div class="pill" id="genHud">⚡ JENERATÖR: 0/3</div>
+  <div class="pill" id="health">❤️❤️❤️</div>
+  <div class="pill" id="coinHud">🪙 0</div>
+  <div class="pill" id="goal">🔑 Anahtarları bul</div>
 </div>
-<div id="task">GÖREVLER<br>□ 2 anahtar bul<br>□ 3 jeneratör çalıştır<br>□ Çıkışa ulaş</div>
-<div id="msg">EVDE YALNIZ DEĞİLSİN...</div>
-<div id="controls">
- <div class="pad">
-  <button class="up" data-dir="up">▲</button>
-  <button class="left" data-dir="left">◀</button>
-  <button class="right" data-dir="right">▶</button>
-  <button class="down" data-dir="down">▼</button>
- </div>
- <div class="actions">
-  <button id="light">🔦</button>
-  <button id="act">⚙️</button>
-  <button id="run">🏃</button>
- </div>
+<div id="message"></div>
+<div id="flash"></div>
+
+<div id="controls" class="hidden">
+  <div id="pad">
+    <button id="up">▲</button>
+    <button id="left">◀</button>
+    <button id="down">▼</button>
+    <button id="right">▶</button>
+  </div>
+  <div id="actions">
+    <button id="light">🔦 FENER</button>
+    <button id="act">✋ ETKİLEŞ</button>
+    <button id="run">🏃 KOŞ</button>
+  </div>
 </div>
-<div id="scare"><canvas id="scareCanvas"></canvas><div id="scareText">YAKALANDIN!</div></div>
+<div id="inventory" class="hidden">Bul: anahtarlar · jeneratörler · çıkış</div>
+
 <div id="menu">
- <h1 id="title">KARANLIK</h1>
- <div style="letter-spacing:3px;color:#aaa">KAÇIŞ PROTOKOLÜ</div>
- <p id="desc">2 anahtar bul. 3 jeneratörü çalıştır. Çıkış kapısına ulaş. Canavar seni avlıyor!</p>
- <p>⚠️ Jeneratörleri çalıştırmak için yanlarına yaklaş ve ⚙️ düğmesine bas.</p>
- <button id="start">OYUNA BAŞLA</button>
+  <div class="panel">
+    <h1>KARANLIK</h1>
+    <p style="color:#bdc5bf">KAÇIŞ MÜMKÜN MÜ?</p>
+    <p class="small">Karanlıkta kaybolan anahtarları bul. Jeneratörleri çalıştır. Canavara yakalanmadan çıkışa ulaş.</p>
+    <button class="main" id="start">▶ OYUNA BAŞLA</button>
+    <button class="main" id="shop">🧥 KOSTÜM MAĞAZASI</button>
+    <button class="main" id="sound">🔊 SES: AÇIK</button>
+    <p class="small" id="saveText">Kayıt sistemi hazır.</p>
+  </div>
 </div>
 
 <script>
 (()=>{
+"use strict";
+const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
 const $=id=>document.getElementById(id);
-const canvas=$("game"),ctx=canvas.getContext("2d");
-const sc=$("scareCanvas"),sctx=sc.getContext("2d");
-let W=innerWidth,H=innerHeight,D=1;
+let W=innerWidth,H=innerHeight,DPR=1;
 function resize(){
- W=innerWidth;H=innerHeight;D=Math.min(devicePixelRatio||1,2);
- canvas.width=W*D;canvas.height=H*D;
- sc.width=W*D;sc.height=H*D;
+  W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);
+  canvas.width=Math.floor(W*DPR);canvas.height=Math.floor(H*DPR);
+  canvas.style.width=W+"px";canvas.style.height=H+"px";
 }
 addEventListener("resize",resize);resize();
 
-const T=48;
-// Büyük, odalı harita. # duvar, . yürünebilir alan.
-const raw=[
-"##############################",
-"#....#...........#...........#",
-"#....#...........#...........#",
-"#....#.....#.....#......#....#",
-"#..........#............#....#",
-"####.#######.#####.######.#####",
-"#...........#.....#............",
-"#...........#.....#............",
-"#....####...#.....#...####.....#",
-"#....#......#.........#........#",
-"#....#......#####.#####....#....#",
-"##.###.....................#....#",
-"#........####.....####.....#....#",
-"#........#...........#...........#",
-"#..####..#....###....#..####......#",
-"#.............#.................#",
-"#####.#########..########.########",
-"#........#........#..............#",
-"#........#........#..............#",
-"#..............#.................#",
-"##############################"
+const T=40,COLS=35,ROWS=29;
+let map=[],player,monster,keys=[],gens=[],chests=[],exit,coins=[];
+let camera={x:0,y:0},running=false,gameOver=false,won=false;
+let lightOn=true, soundOn=true, audio=null, master=null, ambientTimer=null;
+let last=0, elapsed=0, shake=0, messageTimer=0, scareLock=false;
+let collectedKeys=0,activated=0,health=3,sessionCoins=0;
+let owned=["Default"],costume="Default",flashlightBattery=100;
+let inv={};
+const saveKey="karanlik_save_v3";
+const costumes=[
+  {name:"Default",price:0,color:"#d8ddd8"},
+  {name:"Gölge",price:25,color:"#262a2b"},
+  {name:"Kanlı",price:50,color:"#9b2424"},
+  {name:"Hayalet",price:80,color:"#b7d9dc"},
+  {name:"Altın",price:120,color:"#d6ad42"}
 ];
-// Satır uzunluklarını eşitle, kenarları duvar yap.
-const cols=30,rows=21;
-const map=raw.map((r,i)=>{
- let s=r.padEnd(cols,"#").slice(0,cols);
- if(i===0||i===rows-1)s="#".repeat(cols);
- return s;
-});
-const mw=cols*T,mh=rows*T;
-let p,m,keysFound,gens,door,camera,health,flashlight,running=false,last=0;
-const input={};
-let audio=null,master=null,ambience=null;
-let scareUntil=0,scareCount=0,scareLock=false;
-let messageTimer=0;
+function loadSave(){
+  try{
+    const s=JSON.parse(localStorage.getItem(saveKey)||"{}");
+    inv.coins=Math.max(0,Number(s.coins)||0);
+    owned=Array.isArray(s.owned)?s.owned:["Default"];
+    if(!owned.includes("Default"))owned.push("Default");
+    costume=owned.includes(s.costume)?s.costume:"Default";
+  }catch(e){inv.coins=0;owned=["Default"];costume="Default";}
+}
+function save(){
+  try{localStorage.setItem(saveKey,JSON.stringify({coins:inv.coins||0,owned,costume}));}catch(e){}
+  updateHUD();
+}
+loadSave();
 
-function wall(x,y){
- const c=Math.floor(x/T),r=Math.floor(y/T);
- return r<0||c<0||r>=rows||c>=cols||map[r][c]==="#";
+function say(text,time=1800){
+  $("message").textContent=text;messageTimer=time/1000;
 }
-function can(x,y,r=9){
- return !wall(x-r,y-r)&&!wall(x+r,y-r)&&!wall(x-r,y+r)&&!wall(x+r,y+r);
+function updateHUD(){
+  $("health").textContent="❤️".repeat(Math.max(0,health))+"🖤".repeat(Math.max(0,3-health));
+  $("coinHud").textContent="🪙 "+(inv.coins||0);
+  $("goal").textContent=collectedKeys<3?"🔑 Anahtar "+collectedKeys+"/3":activated<3?"⚡ Jeneratör "+activated+"/3":"🚪 ÇIKIŞI BUL";
 }
-function move(e,dx,dy,r,speed,dt){
- const steps=Math.max(1,Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))*speed*dt/4));
- for(let i=0;i<steps;i++){
-  const sx=dx*speed*dt/steps,sy=dy*speed*dt/steps;
-  if(can(e.x+sx,e.y,r))e.x+=sx;
-  if(can(e.x,e.y+sy,r))e.y+=sy;
- }
-}
-function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
-function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
-function hud(){
- $("hp").textContent="❤️ CAN: "+health;
- $("keysHud").textContent="🗝 ANAHTAR: "+keysFound.length+"/2";
- $("genHud").textContent="⚡ JENERATÖR: "+gens.filter(g=>g.on).length+"/3";
- $("task").innerHTML="GÖREVLER<br>"+(keysFound.length===2?"☑":"□")+" 2 anahtar bul<br>"+
- (gens.filter(g=>g.on).length===3?"☑":"□")+" 3 jeneratör çalıştır<br>"+
- (keysFound.length===2&&gens.every(g=>g.on)?"☑":"□")+" Çıkışa ulaş";
-}
-function reset(){
- // Başlangıç bölgesinde güvenli konum.
- p={x:T*2.5,y:T*2.5,walk:0,face:1};
- m={x:T*26.5,y:T*18.5,alert:0,hit:0};
- keysFound=[];
- // Nesneler açık alanlara yerleştirildi.
- gens=[
-  {x:T*7.5,y:T*2.5,on:false},
-  {x:T*17.5,y:T*8.5,on:false},
-  {x:T*23.5,y:T*18.5,on:false}
- ];
- const keyItems=[
-  {x:T*3.5,y:T*9.5,taken:false},
-  {x:T*20.5,y:T*13.5,taken:false}
- ];
- window.keyItems=keyItems;
- door={x:T*27.5,y:T*2.5};
- camera={x:0,y:0};health=3;flashlight=true;
- scareUntil=0;scareCount=0;scareLock=false;
- hud();$("msg").textContent="EVDE YALNIZ DEĞİLSİN...";
-}
-function soundInit(){
- try{
-  if(!audio){
-   audio=new(window.AudioContext||window.webkitAudioContext)();
-   master=audio.createGain();master.gain.value=.32;master.connect(audio.destination);
-   const o=audio.createOscillator(),g=audio.createGain();
-   o.type="sine";o.frequency.value=42;g.gain.value=.15;
-   o.connect(g);g.connect(master);o.start();
-   const len=audio.sampleRate*2,buf=audio.createBuffer(1,len,audio.sampleRate),data=buf.getChannelData(0);
-   for(let i=0;i<len;i++)data[i]=(Math.random()*2-1)*.25;
-   const n=audio.createBufferSource(),ng=audio.createGain(),f=audio.createBiquadFilter();
-   n.buffer=buf;n.loop=true;f.type="lowpass";f.frequency.value=220;ng.gain.value=.13;
-   n.connect(f);f.connect(ng);ng.connect(master);n.start();
+function buildMap(){
+  map=Array.from({length:ROWS},(_,y)=>Array.from({length:COLS},(_,x)=>
+    x===0||y===0||x===COLS-1||y===ROWS-1?1:0
+  ));
+  // Büyük bina: duvarlar ve odalar
+  for(let y=2;y<ROWS-2;y++){
+    if(y!==5&&y!==12&&y!==20) map[y][8]=1;
+    if(y!==8&&y!==17&&y!==24) map[y][17]=1;
+    if(y!==4&&y!==10&&y!==19&&y!==25) map[y][26]=1;
   }
-  if(audio.state==="suspended")audio.resume();
-  if(!ambience)ambience=setInterval(()=>{if(running&&audio?.state==="running"&&Math.random()<.8)tone()},3500);
- }catch(e){}
-}
-function tone(){
- if(!audio||audio.state!=="running")return;
- const o=audio.createOscillator(),g=audio.createGain(),n=audio.currentTime;
- o.type="sawtooth";o.frequency.setValueAtTime(240+Math.random()*180,n);
- o.frequency.exponentialRampToValueAtTime(42,n+1.7);
- g.gain.setValueAtTime(.001,n);g.gain.linearRampToValueAtTime(.13,n+.15);
- g.gain.exponentialRampToValueAtTime(.001,n+1.8);
- o.connect(g);g.connect(master);o.start(n);o.stop(n+1.9);
-}
-function jumpscare(){
- if(scareLock)return;
- scareLock=true;scareCount++;
- scareUntil=performance.now()+1200;
- $("scare").style.display="flex";
- $("scareText").textContent=scareCount%2?"YAKALANDIN!":"ARKANA BAKMA!";
- try{
-  if(audio){
-   const o=audio.createOscillator(),g=audio.createGain(),n=audio.currentTime;
-   o.type="sawtooth";o.frequency.setValueAtTime(90,n);
-   o.frequency.exponentialRampToValueAtTime(1000,n+.1);
-   o.frequency.exponentialRampToValueAtTime(35,n+.8);
-   g.gain.setValueAtTime(.8,n);g.gain.exponentialRampToValueAtTime(.001,n+.9);
-   o.connect(g);g.connect(master);o.start();o.stop(n+1);
+  for(let x=2;x<COLS-2;x++){
+    if(x!==5&&x!==13&&x!==22&&x!==30) map[7][x]=1;
+    if(x!==4&&x!==11&&x!==20&&x!==29) map[15][x]=1;
+    if(x!==6&&x!==15&&x!==24&&x!==31) map[23][x]=1;
   }
- }catch(e){}
- // Jumpscare bitince can kaybı işlenir.
- setTimeout(()=>{
-  $("scare").style.display="none";
-  scareLock=false;
-  if(running){
-   health--;m.hit=1.8;
-   // Canavar oyuncudan biraz uzaklaştırılır.
-   const dx=p.x-m.x,dy=p.y-m.y,d=Math.hypot(dx,dy)||1;
-   p.x=clamp(p.x+dx/d*55,T,mw-T);
-   p.y=clamp(p.y+dy/d*55,T,mh-T);
-   hud();
-   if(health<=0){finish(false);return}
-   $("msg").textContent="KAÇ! CANAVAR YAKININDA!";
-  }
- },1200);
+  // Odaların içinde küçük engeller
+  [[4,3],[5,3],[12,4],[13,4],[21,3],[22,3],[29,4],[30,4],
+   [3,11],[4,11],[11,10],[12,10],[20,11],[21,11],[29,12],[30,12],
+   [4,19],[5,19],[12,18],[13,18],[20,19],[21,19],[29,18],[30,18],
+   [4,26],[12,26],[20,26],[29,26]].forEach(([x,y])=>map[y][x]=1);
+  // Kapılar ve bağlantılar
+  [[8,5],[8,12],[8,20],[17,8],[17,17],[17,24],[26,4],[26,10],[26,19],[26,25],
+   [5,7],[13,7],[22,7],[30,7],[4,15],[11,15],[20,15],[29,15],[6,23],[15,23],[24,23],[31,23]]
+  .forEach(([x,y])=>map[y][x]=0);
+  // Kenarlar kesin kapalı
+  for(let x=0;x<COLS;x++){map[0][x]=1;map[ROWS-1][x]=1;}
+  for(let y=0;y<ROWS;y++){map[y][0]=1;map[y][COLS-1]=1;}
 }
-function finish(win){
- running=false;
- $("title").textContent=win?"KURTULDUN!":"OYUN BİTTİ";
- $("desc").textContent=win?"Tüm görevleri tamamladın ve evden kaçtın!":"Canavar seni yakaladı. Tekrar dene!";
- $("start").textContent="TEKRAR OYNA";
- $("menu").style.display="flex";
+function tile(x,y){let tx=Math.floor(x/T),ty=Math.floor(y/T);return map[ty]?.[tx]??1;}
+function blocked(x,y,r=10){
+  return tile(x-r,y-r)||tile(x+r,y-r)||tile(x-r,y+r)||tile(x+r,y+r);
 }
-function start(){
- soundInit();reset();running=true;
- $("menu").style.display="none";last=performance.now();requestAnimationFrame(loop);
+function place(x,y){return{x:(x+.5)*T,y:(y+.5)*T};}
+function initGame(){
+  buildMap();
+  player={x:place(2,2).x,y:place(2,2).y,speed:145,dx:0,dy:-1,faceX:0,faceY:-1,walk:0};
+  monster={...place(32,26),speed:49,alert:0,stun:0};
+  keys=[place(5,4),place(13,11),place(29,20)].map(o=>({...o,got:false}));
+  gens=[place(6,10),place(21,5),place(29,25)].map(o=>({...o,on:false}));
+  chests=[place(4,13),place(22,18),place(12,25)].map(o=>({...o,open:false}));
+  exit=place(32,2);
+  coins=[];
+  [[3,5],[12,3],[20,8],[30,10],[4,18],[14,20],[23,13],[31,21],[10,27],[25,27]]
+  .forEach(([x,y])=>coins.push({...place(x,y),got:false}));
+  collectedKeys=0;activated=0;health=3;sessionCoins=0;
+  flashlightBattery=100;elapsed=0;shake=0;gameOver=false;won=false;scareLock=false;
+  updateHUD();
 }
-$("start").addEventListener("click",start);
-$("light").addEventListener("pointerdown",e=>{e.preventDefault();flashlight=!flashlight});
-$("run").addEventListener("pointerdown",e=>{e.preventDefault();input.run=true});
-["pointerup","pointercancel","pointerleave"].forEach(ev=>$("run").addEventListener(ev,()=>input.run=false));
-document.querySelectorAll("[data-dir]").forEach(b=>{
- const dir=b.dataset.dir;
- b.addEventListener("pointerdown",e=>{e.preventDefault();input[dir]=true;try{b.setPointerCapture(e.pointerId)}catch(_){}});
- ["pointerup","pointercancel","pointerleave","lostpointercapture"].forEach(ev=>b.addEventListener(ev,()=>input[dir]=false));
+const dirs={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+const held={up:false,down:false,left:false,right:false,run:false};
+function setHeld(name,val){held[name]=val;}
+["up","down","left","right"].forEach(n=>{
+  const b=$(n);
+  b.addEventListener("pointerdown",e=>{e.preventDefault();b.setPointerCapture?.(e.pointerId);setHeld(n,true);});
+  ["pointerup","pointercancel","lostpointercapture"].forEach(ev=>b.addEventListener(ev,e=>{e.preventDefault();setHeld(n,false);}));
 });
+$("run").addEventListener("pointerdown",e=>{e.preventDefault();held.run=true;});
+["pointerup","pointercancel","pointerleave"].forEach(ev=>$("run").addEventListener(ev,()=>held.run=false));
+
+function soundInit(){
+  if(!soundOn)return;
+  try{
+    if(!audio){
+      audio=new (window.AudioContext||window.webkitAudioContext)();
+      master=audio.createGain();master.gain.value=.32;master.connect(audio.destination);
+      startAmbient();
+    }
+    if(audio.state==="suspended")audio.resume();
+  }catch(e){}
+}
+function tone(freq,duration,type="sine",vol=.12,slide=0){
+  if(!soundOn)return;
+  soundInit();if(!audio)return;
+  try{
+    const o=audio.createOscillator(),g=audio.createGain(),now=audio.currentTime;
+    o.type=type;o.frequency.setValueAtTime(freq,now);
+    if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,freq+slide),now+duration);
+    g.gain.setValueAtTime(.001,now);g.gain.linearRampToValueAtTime(vol,now+.03);
+    g.gain.exponentialRampToValueAtTime(.001,now+duration);
+    o.connect(g);g.connect(master);o.start(now);o.stop(now+duration+.03);
+  }catch(e){}
+}
+function noise(duration,vol=.12,filter=500){
+  if(!soundOn)return;
+  soundInit();if(!audio)return;
+  try{
+    const len=Math.floor(audio.sampleRate*duration),buf=audio.createBuffer(1,len,audio.sampleRate);
+    const data=buf.getChannelData(0);
+    for(let i=0;i<len;i++)data[i]=(Math.random()*2-1)*(1-i/len);
+    const src=audio.createBufferSource(),f=audio.createBiquadFilter(),g=audio.createGain();
+    src.buffer=buf;f.type="lowpass";f.frequency.value=filter;g.gain.value=vol;
+    src.connect(f);f.connect(g);g.connect(master);src.start();
+  }catch(e){}
+}
+function startAmbient(){
+  if(ambientTimer)clearInterval(ambientTimer);
+  ambientTimer=setInterval(()=>{
+    if(!running||!soundOn)return;
+    tone(38+Math.random()*13,2.2,"sine",.045,-8);
+    if(Math.random()<.55)tone(120+Math.random()*100,.7,"triangle",.018,-65);
+    if(monster&&player){
+      const d=Math.hypot(player.x-monster.x,player.y-monster.y);
+      if(d<400&&Math.random()<.7)tone(55+Math.random()*25,.45,"sawtooth",.025,-15);
+    }
+  },1900);
+}
+function sfx(name){
+  if(name==="key"){tone(780,.12,"sine",.12,180);tone(1100,.22,"sine",.08,100);}
+  if(name==="generator"){tone(65,.8,"sawtooth",.16,70);noise(.4,.08,300);}
+  if(name==="door"){noise(.55,.15,250);tone(90,.5,"sawtooth",.08,-50);}
+  if(name==="chest"){noise(.35,.11,800);tone(180,.3,"triangle",.09,120);}
+  if(name==="monster"){tone(115,.65,"sawtooth",.15,-80);noise(.8,.12,700);}
+  if(name==="coin"){tone(850,.1,"sine",.09,250);}
+  if(name==="hit"){tone(100,.45,"sawtooth",.18,-75);noise(.4,.13,450);}
+  if(name==="win"){tone(420,.3,"sine",.13,200);tone(650,.5,"sine",.12,250);}
+}
+function startGame(){
+  soundInit();initGame();running=true;
+  $("menu").classList.add("hidden");$("controls").classList.remove("hidden");$("inventory").classList.remove("hidden");
+  say("Fenerini kullan. Canavar seni duyabilir.",2500);
+  last=performance.now();requestAnimationFrame(loop);
+}
+$("start").onclick=startGame;
+$("sound").onclick=()=>{
+  soundOn=!soundOn;$("sound").textContent="🔊 SES: "+(soundOn?"AÇIK":"KAPALI");
+  if(soundOn)soundInit();
+};
+$("shop").onclick=()=>{
+  let text="KOSTÜM MAĞAZASI\nCoin: "+(inv.coins||0)+"\n\n";
+  costumes.forEach(c=>text+=c.name+" — "+(owned.includes(c.name)?"AÇIK":c.price+" coin")+"\n");
+  const choice=prompt(text+"Kostüm adını yaz (Default, Gölge, Kanlı, Hayalet, Altın):");
+  if(!choice)return;
+  const c=costumes.find(x=>x.name.toLowerCase()===choice.trim().toLowerCase());
+  if(!c){alert("Böyle bir kostüm yok.");return;}
+  if(!owned.includes(c.name)){
+    if((inv.coins||0)<c.price){alert("Yeterli coin yok!");return;}
+    inv.coins-=c.price;owned.push(c.name);
+  }
+  costume=c.name;save();alert(c.name+" kostümü seçildi!");
+};
+
+$("light").onclick=()=>{lightOn=!lightOn;$("light").textContent=lightOn?"🔦 FENER":"🌑 FENER KAPALI";tone(lightOn?400:150,.12,"triangle",.07);};
+$("act").onclick=interact;
 addEventListener("keydown",e=>{
- const a={ArrowUp:"up",w:"up",ArrowDown:"down",s:"down",ArrowLeft:"left",a:"left",ArrowRight:"right",d:"right",Shift:"run",e:"act"};
- if(a[e.key]){e.preventDefault();input[a[e.key]]=true}
+  const k=e.key.toLowerCase();
+  if(k==="w"||k==="arrowup")held.up=true;
+  if(k==="s"||k==="arrowdown")held.down=true;
+  if(k==="a"||k==="arrowleft")held.left=true;
+  if(k==="d"||k==="arrowright")held.right=true;
+  if(k==="shift")held.run=true;
+  if(k==="e"||k===" ")interact();
+  if(k==="f")$("light").click();
 });
 addEventListener("keyup",e=>{
- const a={ArrowUp:"up",w:"up",ArrowDown:"down",s:"down",ArrowLeft:"left",a:"left",ArrowRight:"right",d:"right",Shift:"run",e:"act"};
- if(a[e.key])input[a[e.key]]=false;
+  const k=e.key.toLowerCase();
+  if(k==="w"||k==="arrowup")held.up=false;
+  if(k==="s"||k==="arrowdown")held.down=false;
+  if(k==="a"||k==="arrowleft")held.left=false;
+  if(k==="d"||k==="arrowright")held.right=false;
+  if(k==="shift")held.run=false;
 });
-document.addEventListener("contextmenu",e=>e.preventDefault());
-document.addEventListener("selectstart",e=>e.preventDefault());
-document.addEventListener("gesturestart",e=>e.preventDefault());
-document.addEventListener("dblclick",e=>e.preventDefault());
-let lastTouch=0;
-document.addEventListener("touchend",e=>{let n=Date.now();if(n-lastTouch<350)e.preventDefault();lastTouch=n},{passive:false});
-
-function activate(){
- if(!running||scareLock)return;
- for(const g of gens){
-  if(!g.on&&dist(p,g)<T*1.4){
-   g.on=true;hud();tone();
-   $("msg").textContent="JENERATÖR ÇALIŞTI! ("+gens.filter(x=>x.on).length+"/3)";
-   return;
+function interact(){
+  if(!running||gameOver||won)return;
+  const near=(o,r=54)=>Math.hypot(player.x-o.x,player.y-o.y)<r;
+  let obj=gens.find(g=>!g.on&&near(g));
+  if(obj){obj.on=true;activated++;sfx("generator");say("JENERATÖR ÇALIŞTI! "+activated+"/3",1600);updateHUD();return;}
+  obj=chests.find(c=>!c.open&&near(c));
+  if(obj){obj.open=true;const prize=5+Math.floor(Math.random()*9);inv.coins=(inv.coins||0)+prize;sessionCoins+=prize;save();sfx("chest");say("Sandık açıldı! +"+prize+" coin",1600);return;}
+  if(near(exit,65)){
+    if(collectedKeys<3){say("Çıkış kilitli! 3 anahtarı bul.",1600);sfx("door");return;}
+    if(activated<3){say("Önce 3 jeneratörü çalıştır!",1600);return;}
+    winGame();return;
   }
- }
- if(dist(p,door)<T*1.7){
-  if(keysFound.length===2&&gens.every(g=>g.on)){finish(true);return}
-  $("msg").textContent="KAPI KİLİTLİ! 2 ANAHTAR + 3 JENERATÖR GEREKLİ.";
-  return;
- }
- for(const q of window.keyItems){
-  if(!q.taken&&dist(p,q)<T*1.4){
-   q.taken=true;keysFound.push(q);hud();tone();
-   $("msg").textContent="ANAHTAR BULUNDU! ("+keysFound.length+"/2)";
-   return;
-  }
- }
- $("msg").textContent="YAKININDA ETKİLEŞİME GİREBİLECEĞİN BİR ŞEY YOK.";
+  say("Yakında etkileşime geçilecek bir şey yok.",1000);
 }
-$("act").addEventListener("pointerdown",e=>{e.preventDefault();activate()});
-
+function winGame(){
+  won=true;running=false;inv.coins=(inv.coins||0)+20;save();sfx("win");
+  $("menu").classList.remove("hidden");$("controls").classList.add("hidden");$("inventory").classList.add("hidden");
+  $("menu").querySelector("h1").textContent="KAÇTIN!";
+  $("menu").querySelector("p").textContent="Hayatta kaldın. +20 COIN";
+  $("start").textContent="↻ TEKRAR OYNA";say("KAÇMAYI BAŞARDIN!",3000);
+}
+function die(){
+  gameOver=true;running=false;
+  $("flash").style.opacity=.7;setTimeout(()=>$("flash").style.opacity=0,300);
+  $("menu").classList.remove("hidden");$("controls").classList.add("hidden");$("inventory").classList.add("hidden");
+  $("menu").querySelector("h1").textContent="YAKALANDIN";
+  $("menu").querySelector("p").textContent="Karanlık seni yuttu...";
+  $("start").textContent="↻ YENİDEN DENE";
+}
+function jumpscare(){
+  if(scareLock)return;scareLock=true;shake=14;sfx("monster");
+  $("flash").style.opacity=.8;
+  setTimeout(()=>$("flash").style.opacity=0,180);
+  setTimeout(()=>{shake=0;scareLock=false;},500);
+}
 function update(dt){
- if(!running||scareLock)return;
- dt=Math.min(dt,.04);
- let dx=(input.right?1:0)-(input.left?1:0),dy=(input.down?1:0)-(input.up?1:0);
- const moving=!!(dx||dy),mag=Math.hypot(dx,dy)||1;dx/=mag;dy/=mag;
- const speed=input.run?210:135;
- if(moving){
-  p.walk+=dt*(input.run?13:8);p.face=dx||p.face;
-  move(p,dx,dy,8,speed,dt);
- }
- const d=dist(p,m);
- m.alert=(d<350||input.run)?Math.min(1,m.alert+dt*.35):Math.max(0,m.alert-dt*.025);
- if(d>25){
-  const vx=(p.x-m.x)/(d||1),vy=(p.y-m.y)/(d||1);
-  move(m,vx,vy,13,48+m.alert*65,dt);
- }
- if(d<34&&m.hit<=0){jumpscare();return}
- m.hit=Math.max(0,m.hit-dt);
- if(d<180)$("msg").textContent="CANAVAR YAKININDA! KAÇ!";
- else if(d<330)$("msg").textContent="AYAK SESLERİ DUYUYORSUN...";
- else $("msg").textContent="GÖREVLERİ TAMAMLA VE KAÇ.";
- camera.x=clamp(p.x-W/2,0,Math.max(0,mw-W));
- camera.y=clamp(p.y-H/2,0,Math.max(0,mh-H));
-}
-function drawWorld(){
- ctx.fillStyle="#302924";ctx.fillRect(0,0,mw,mh);
- for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
-  const x=c*T,y=r*T;
-  if(map[r][c]==="#"){
-   ctx.fillStyle="#353039";ctx.fillRect(x,y,T,T);
-   ctx.fillStyle="#211e24";ctx.fillRect(x+3,y+3,T-6,T-6);
-   ctx.strokeStyle="#48404a";ctx.strokeRect(x+4,y+4,T-8,T-8);
-  }else{
-   ctx.fillStyle=(r+c)%2?"#39302a":"#302924";ctx.fillRect(x,y,T,T);
-   ctx.strokeStyle="#493b32";ctx.strokeRect(x,y,T,T);
+  if(!running||gameOver||won)return;
+  elapsed+=dt;
+  if(messageTimer>0){messageTimer-=dt;if(messageTimer<=0)$("message").textContent="";}
+  flashlightBattery=Math.max(0,flashlightBattery-dt*(lightOn?.45:0));
+  if(flashlightBattery<=0)lightOn=false;
+  let dx=(held.right?1:0)-(held.left?1:0),dy=(held.down?1:0)-(held.up?1:0);
+  if(dx||dy){
+    const len=Math.hypot(dx,dy);dx/=len;dy/=len;
+    player.dx=dx;player.dy=dy;player.walk+=dt*12;
+    // Kafa hep dik durur; bakış yönü hareket yönünü takip eder.
+    player.faceX=dx;player.faceY=dy;
+    const speed=player.speed*(held.run?1.55:1);
+    const nx=player.x+dx*speed*dt,ny=player.y+dy*speed*dt;
+    if(!blocked(nx,player.y,10))player.x=nx;
+    if(!blocked(player.x,ny,10))player.y=ny;
   }
- }
- for(const g of gens){
-  ctx.fillStyle=g.on?"#286d35":"#55504a";
-  ctx.fillRect(g.x-15,g.y-18,30,36);
-  ctx.fillStyle=g.on?"#43ff65":"#e33";
-  ctx.beginPath();ctx.arc(g.x,g.y-9,4,0,7);ctx.fill();
-  ctx.fillStyle="#aaa";ctx.fillRect(g.x-8,g.y+3,16,10);
- }
- for(const q of window.keyItems){
-  if(q.taken)continue;
-  ctx.strokeStyle="#ffe16a";ctx.lineWidth=4;ctx.beginPath();
-  ctx.arc(q.x-5,q.y,6,0,7);ctx.moveTo(q.x+1,q.y);ctx.lineTo(q.x+15,q.y);
-  ctx.lineTo(q.x+15,q.y+5);ctx.stroke();
- }
- ctx.fillStyle=keysFound.length===2&&gens.every(g=>g.on)?"#287b39":"#651b20";
- ctx.fillRect(door.x-17,door.y-23,34,46);
- ctx.strokeStyle="#b99b6b";ctx.lineWidth=3;ctx.strokeRect(door.x-17,door.y-23,34,46);
-}
-function drawPlayer(x,y){
- const swing=Math.sin(p.walk)*5,bob=Math.abs(Math.sin(p.walk))*2;
- ctx.save();ctx.translate(x,y-bob);
- ctx.fillStyle="#090909";ctx.beginPath();ctx.ellipse(0,13,15,6,0,0,7);ctx.fill();
- ctx.strokeStyle="#252d3a";ctx.lineWidth=7;ctx.lineCap="round";
- ctx.beginPath();ctx.moveTo(-5,3);ctx.lineTo(-6+swing,13);ctx.moveTo(5,3);ctx.lineTo(6-swing,13);ctx.stroke();
- ctx.fillStyle="#17171b";ctx.fillRect(-12+swing,10,9,5);ctx.fillRect(3-swing,10,9,5);
- ctx.fillStyle="#315a7b";ctx.fillRect(-11,-12,22,19);
- ctx.fillStyle="#6e9ab2";ctx.fillRect(-3,-11,6,16);
- ctx.strokeStyle="#bd8c68";ctx.lineWidth=6;ctx.beginPath();
- ctx.moveTo(-9,-8);ctx.lineTo(-14-swing,-1);ctx.moveTo(9,-8);ctx.lineTo(13+swing,-3);ctx.stroke();
- ctx.fillStyle="#ddd4ae";ctx.fillRect(10+swing,-6,10,5);
- ctx.fillStyle="#d1a17b";ctx.beginPath();ctx.ellipse(0,-24,10,12,0,0,7);ctx.fill();
- ctx.fillStyle="#241811";ctx.beginPath();ctx.arc(0,-28,10,Math.PI,Math.PI*2);ctx.lineTo(10,-23);ctx.lineTo(5,-28);ctx.lineTo(1,-23);ctx.lineTo(-4,-28);ctx.lineTo(-10,-22);ctx.fill();
- ctx.fillStyle="#160d0b";ctx.fillRect(-6,-24,3,3);ctx.fillRect(3,-24,3,3);
- ctx.restore();
-}
-function drawMonster(x,y){
- ctx.save();ctx.translate(x,y+Math.sin(performance.now()/140)*2);
- ctx.fillStyle="#100b09";ctx.beginPath();ctx.ellipse(0,9,22,26,0,0,7);ctx.fill();
- ctx.fillStyle="#55402c";ctx.beginPath();ctx.ellipse(0,5,18,23,0,0,7);ctx.fill();
- ctx.fillStyle="#3b2a20";ctx.beginPath();ctx.arc(-13,-20,9,0,7);ctx.arc(13,-20,9,0,7);ctx.fill();
- ctx.fillStyle="#9d2724";ctx.beginPath();ctx.arc(-13,-20,4,0,7);ctx.arc(13,-20,4,0,7);ctx.fill();
- ctx.fillStyle="#725234";ctx.beginPath();ctx.ellipse(0,-10,22,21,0,0,7);ctx.fill();
- ctx.strokeStyle="#20130e";ctx.lineWidth=3;ctx.stroke();
- ctx.fillStyle="#070000";ctx.beginPath();ctx.ellipse(-8,-11,7,8,0,0,7);ctx.ellipse(8,-11,7,8,0,0,7);ctx.fill();
- ctx.shadowColor="#f00";ctx.shadowBlur=18;ctx.fillStyle="#ff1208";
- ctx.beginPath();ctx.arc(-8,-11,4,0,7);ctx.arc(8,-11,4,0,7);ctx.fill();ctx.shadowBlur=0;
- ctx.fillStyle="#130b09";ctx.beginPath();ctx.ellipse(0,-3,6,4,0,0,7);ctx.fill();
- ctx.fillStyle="#d0bda0";ctx.fillRect(-13,2,26,12);ctx.fillStyle="#250d0c";ctx.fillRect(-11,3,22,9);
- ctx.fillStyle="#e7d8bd";for(let i=-9;i<=8;i+=6)ctx.fillRect(i,3,3,5);
- ctx.strokeStyle="#59402b";ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(-15,1);ctx.lineTo(-25,15);ctx.moveTo(15,1);ctx.lineTo(25,14);ctx.stroke();
- ctx.restore();
+  keys.forEach(k=>{
+    if(!k.got&&Math.hypot(player.x-k.x,player.y-k.y)<24){
+      k.got=true;collectedKeys++;inv.coins=(inv.coins||0)+3;sessionCoins+=3;save();sfx("key");say("Anahtar bulundu! +3 coin",1200);updateHUD();
+    }
+  });
+  coins.forEach(c=>{
+    if(!c.got&&Math.hypot(player.x-c.x,player.y-c.y)<22){
+      c.got=true;inv.coins=(inv.coins||0)+1;sessionCoins++;save();sfx("coin");
+    }
+  });
+  // Canavar görüş ve takip
+  const dist=Math.hypot(player.x-monster.x,player.y-monster.y);
+  const sight=lightOn?490:270;
+  if(dist<sight)monster.alert=Math.min(1,monster.alert+dt*.65);
+  else monster.alert=Math.max(0,monster.alert-dt*.08);
+  const speed=monster.speed+monster.alert*62;
+  if(monster.stun>0)monster.stun-=dt;
+  else if(dist<650){
+    let mx=(player.x-monster.x)/(dist||1),my=(player.y-monster.y)/(dist||1);
+    const nx=monster.x+mx*speed*dt,ny=monster.y+my*speed*dt;
+    if(!blocked(nx,monster.y,12))monster.x=nx;
+    if(!blocked(monster.x,ny,12))monster.y=ny;
+  }
+  if(dist<29){
+    jumpscare();health--;player.x=place(2,2).x;player.y=place(2,2).y;
+    monster.stun=2.4;monster.x=place(32,26).x;monster.y=place(32,26).y;
+    sfx("hit");updateHUD();
+    if(health<=0)die();else say("CANAVAR YAKALADI! DİKKATLİ OL!",1900);
+  }
+  camera.x=Math.max(0,Math.min(COLS*T-W,player.x-W/2));
+  camera.y=Math.max(0,Math.min(ROWS*T-H,player.y-H/2));
 }
 function draw(){
- ctx.setTransform(D,0,0,D,0,0);ctx.clearRect(0,0,W,H);
- ctx.save();ctx.translate(-camera.x,-camera.y);drawWorld();ctx.restore();
- const px=p.x-camera.x,py=p.y-camera.y;
- // Fener açıkken çevre aydınlanır.
- ctx.fillStyle=flashlight?"rgba(0,0,0,.91)":"rgba(0,0,0,.67)";
- ctx.fillRect(0,0,W,H);
- if(flashlight){
-  const radius=Math.min(W,H)*.47;
-  const g=ctx.createRadialGradient(px,py,5,px,py,radius);
-  g.addColorStop(0,"rgba(255,255,255,1)");
-  g.addColorStop(.45,"rgba(255,255,255,.85)");
-  g.addColorStop(1,"rgba(255,255,255,0)");
-  ctx.globalCompositeOperation="destination-out";
-  ctx.fillStyle=g;ctx.beginPath();ctx.arc(px,py,radius,0,7);ctx.fill();
-  ctx.globalCompositeOperation="source-over";
- }
- // Oyuncu ve canavar karanlık katmanından sonra görünür çizilir.
- ctx.save();ctx.translate(-camera.x+(Math.random()-.5)*shake,-camera.y+(Math.random()-.5)*shake);
- drawMonster(m.x,m.y);drawPlayer(p.x,p.y);ctx.restore();
- const v=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.2,W/2,H/2,Math.max(W,H)*.75);
- v.addColorStop(0,"rgba(0,0,0,0)");v.addColorStop(1,"rgba(0,0,0,.45)");
- ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.fillStyle="#050707";ctx.fillRect(0,0,W,H);
+  if(!map.length)return;
+  ctx.save();
+  ctx.translate(-camera.x+(Math.random()-.5)*shake,-camera.y+(Math.random()-.5)*shake);
+  const sx=Math.max(0,Math.floor(camera.x/T)-1),sy=Math.max(0,Math.floor(camera.y/T)-1);
+  const ex=Math.min(COLS,Math.ceil((camera.x+W)/T)+1),ey=Math.min(ROWS,Math.ceil((camera.y+H)/T)+1);
+  for(let y=sy;y<ey;y++)for(let x=sx;x<ex;x++){
+    const px=x*T,py=y*T;
+    ctx.fillStyle=(x+y)%2?"#171b19":"#131715";ctx.fillRect(px,py,T,T);
+    if(map[y][x]){
+      ctx.fillStyle="#303832";ctx.fillRect(px,py,T,T);
+      ctx.fillStyle="#424a44";ctx.fillRect(px,py,T,4);
+      ctx.fillStyle="#080a09";ctx.fillRect(px+3,py+5,T-6,T-8);
+    }else{
+      ctx.strokeStyle="#202622";ctx.lineWidth=1;ctx.strokeRect(px,py,T,T);
+      if((x*7+y*13)%23===0){ctx.fillStyle="#29251f";ctx.fillRect(px+8,py+8,3,2);}
+    }
+  }
+  // Çıkış
+  ctx.fillStyle=collectedKeys>=3&&activated>=3?"#275f38":"#3a1b1b";
+  ctx.fillRect(exit.x-16,exit.y-19,32,38);
+  ctx.strokeStyle="#929c92";ctx.lineWidth=3;ctx.strokeRect(exit.x-16,exit.y-19,32,38);
+  ctx.fillStyle="#e0d8a1";ctx.fillRect(exit.x+7,exit.y,3,3);
+  // Anahtarlar
+  keys.forEach(k=>{if(k.got)return;
+    ctx.save();ctx.translate(k.x,k.y);ctx.rotate(Math.sin(elapsed*3)*.2);
+    ctx.strokeStyle="#e3c65a";ctx.lineWidth=4;ctx.beginPath();ctx.arc(-3,-3,6,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(2,1);ctx.lineTo(13,12);ctx.lineTo(10,15);ctx.moveTo(8,9);ctx.lineTo(11,6);ctx.stroke();ctx.restore();
+  });
+  gens.forEach(g=>{
+    ctx.fillStyle=g.on?"#397b49":"#4b322c";ctx.fillRect(g.x-13,g.y-17,26,34);
+    ctx.fillStyle=g.on?"#7cff9d":"#bd4b3c";ctx.beginPath();ctx.arc(g.x,g.y-5,5,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle="#78827b";ctx.fillRect(g.x-8,g.y+7,16,4);
+  });
+  chests.forEach(c=>{
+    ctx.fillStyle=c.open?"#342a1d":"#76502b";ctx.fillRect(c.x-14,c.y-10,28,20);
+    ctx.strokeStyle="#c5a76b";ctx.strokeRect(c.x-14,c.y-10,28,20);
+    if(!c.open){ctx.fillStyle="#e3c65a";ctx.fillRect(c.x-3,c.y-2,6,7);}
+  });
+  coins.forEach(c=>{if(c.got)return;ctx.fillStyle="#f2ca4d";ctx.beginPath();ctx.arc(c.x,c.y,6,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#fff0a0";ctx.stroke();});
+  drawMonster();drawPlayer();
+  ctx.restore();
+  // Karanlık ve fener ışığı
+  ctx.save();
+  ctx.fillStyle="rgba(0,0,0,"+(lightOn?.88:.96)+")";ctx.fillRect(0,0,W,H);
+  const px=player.x-camera.x,py=player.y-camera.y;
+  if(lightOn&&flashlightBattery>0){
+    const fx=px+player.faceX*20,fy=py+player.faceY*20;
+    const angle=Math.atan2(player.faceY,player.faceX);
+    const grad=ctx.createRadialGradient(px,py,12,px,py,245);
+    grad.addColorStop(0,"rgba(255,241,188,.58)");
+    grad.addColorStop(.5,"rgba(255,228,150,.18)");
+    grad.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.globalCompositeOperation="destination-out";
+    ctx.beginPath();ctx.arc(px,py,108,0,Math.PI*2);ctx.fill();
+    ctx.globalCompositeOperation="source-over";
+    ctx.fillStyle=grad;ctx.beginPath();ctx.arc(px,py,245,0,Math.PI*2);ctx.fill();
+    // Fener konisi
+    ctx.fillStyle="rgba(255,237,175,.07)";
+    ctx.beginPath();ctx.moveTo(fx,fy);ctx.arc(fx,fy,235,angle-.42,angle+.42);ctx.closePath();ctx.fill();
+  }else{
+    const grad=ctx.createRadialGradient(px,py,2,px,py,65);
+    grad.addColorStop(0,"rgba(150,160,150,.15)");grad.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.fillStyle=grad;ctx.beginPath();ctx.arc(px,py,65,0,Math.PI*2);ctx.fill();
+  }
+  // Kırmızı uyarı canavar yakındayken
+  if(monster&&Math.hypot(player.x-monster.x,player.y-monster.y)<260){
+    const a=(260-Math.hypot(player.x-monster.x,player.y-monster.y))/260*.23;
+    ctx.fillStyle="rgba(110,0,0,"+a+")";ctx.fillRect(0,0,W,H);
+  }
+  ctx.restore();
+  // Pil göstergesi
+  ctx.fillStyle="#111";ctx.fillRect(W/2-55,56,110,7);
+  ctx.fillStyle=flashlightBattery>25?"#c5d3b8":"#c54242";
+  ctx.fillRect(W/2-55,56,110*flashlightBattery/100,7);
+  ctx.fillStyle="#c4ccc5";ctx.font="10px Arial";ctx.textAlign="center";ctx.fillText("FENER PİLİ",W/2,51);
 }
-function drawScare(){
- const w=sc.width,h=sc.height;
- sctx.setTransform(1,0,0,1,0,0);sctx.clearRect(0,0,w,h);
- sctx.fillStyle="#180000";sctx.fillRect(0,0,w,h);
- const t=performance.now()/30;
- sctx.save();sctx.translate(w/2+(Math.random()-.5)*35,h/2+(Math.random()-.5)*35);
- sctx.scale(1.4+Math.random()*.3,1.4+Math.random()*.3);
- sctx.fillStyle="#33271b";sctx.beginPath();sctx.arc(-75,-100,65,0,7);sctx.arc(75,-100,65,0,7);sctx.fill();
- sctx.fillStyle="#795331";sctx.beginPath();sctx.ellipse(0,-15,150,170,0,0,7);sctx.fill();
- sctx.fillStyle="#070000";sctx.beginPath();sctx.ellipse(-57,-45,38,48,0,0,7);sctx.ellipse(57,-45,38,48,0,0,7);sctx.fill();
- sctx.shadowColor="red";sctx.shadowBlur=40;sctx.fillStyle="#f00";
- sctx.beginPath();sctx.arc(-57,-45,23,0,7);sctx.arc(57,-45,23,0,7);sctx.fill();sctx.shadowBlur=0;
- sctx.fillStyle="#080000";sctx.beginPath();sctx.ellipse(0,40,85,62,0,0,7);sctx.fill();
- sctx.fillStyle="#eee";for(let i=-65;i<70;i+=25)sctx.fillRect(i,8,17,28);
- sctx.restore();
+function drawPlayer(){
+  const p=player;
+  const skin=costumes.find(c=>c.name===costume)?.color||"#d8ddd8";
+  // Gövde
+  ctx.fillStyle="#080909";ctx.beginPath();ctx.ellipse(p.x,p.y+5,12,14,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=skin;ctx.fillRect(p.x-8,p.y-5,16,20);
+  // Baş daima dik durur; gözler hareket yönüne kayar ama baş ters dönmez.
+  ctx.fillStyle=skin;ctx.beginPath();ctx.arc(p.x,p.y-12,10,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#101313";ctx.beginPath();ctx.arc(p.x-3+p.faceX*3,p.y-14+p.faceY*2,2,0,Math.PI*2);ctx.arc(p.x+3+p.faceX*3,p.y-14+p.faceY*2,2,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#333";ctx.fillRect(p.x-8,p.y+17,6,6);ctx.fillRect(p.x+2,p.y+17,6,6);
+}
+function drawMonster(){
+  const m=monster;
+  ctx.fillStyle="#080505";ctx.beginPath();ctx.ellipse(m.x,m.y,17,21,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#501414";ctx.beginPath();ctx.arc(m.x,m.y-12,12,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#ff1b1b";ctx.shadowColor="#ff0000";ctx.shadowBlur=13;
+  ctx.fillRect(m.x-7,m.y-15,4,3);ctx.fillRect(m.x+3,m.y-15,4,3);ctx.shadowBlur=0;
+  ctx.strokeStyle="#a3a3a3";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(m.x-7,m.y+1);ctx.lineTo(m.x+7,m.y+1);ctx.stroke();
 }
 function loop(now){
- if(!running)return;
- const dt=(now-last)/1000;last=now;update(dt);draw();
- if($("scare").style.display==="flex")drawScare();
- if(running)requestAnimationFrame(loop);
+  if(!running)return;
+  const dt=Math.min((now-last)/1000,.04);last=now;
+  update(dt);draw();
+  requestAnimationFrame(loop);
 }
-reset();draw();
+// Menü açılışında oyun alanını da çiz
+buildMap();
+player={...place(2,2),faceX:0,faceY:-1,walk:0};
+monster={...place(32,26),alert:0};
+camera={x:0,y:0};
+draw();
 })();
 </script>
 </body>
