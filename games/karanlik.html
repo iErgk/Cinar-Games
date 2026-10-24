@@ -1,1 +1,271 @@
 
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#050609">
+<title>KARANLIK | Çınar Games</title>
+<style>
+*{box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050609;color:#fff;font-family:Arial,sans-serif;touch-action:none}
+#game{position:relative;width:100%;height:100dvh;max-width:700px;margin:auto;overflow:hidden;background:#08090c}
+canvas{width:100%;height:100%;display:block}
+#hud{position:absolute;top:max(10px,env(safe-area-inset-top));left:9px;right:9px;display:flex;justify-content:space-between;gap:5px;align-items:center;z-index:2}
+.info,button{color:white;background:#151720;border:1px solid #777;border-radius:10px;font-weight:bold}
+.info{padding:9px;font-size:12px}
+button{touch-action:none;cursor:pointer}
+#flash,#pause{padding:10px;font-size:13px}
+#controls{position:absolute;bottom:max(16px,env(safe-area-inset-bottom));left:9px;right:9px;display:flex;justify-content:space-between;align-items:flex-end;z-index:2}
+.group{display:flex;gap:7px}
+.control{width:59px;height:63px;font-size:24px;border-radius:16px;background:#151923eF}
+#run{background:#263650}
+#message{position:absolute;top:18%;left:10px;right:10px;text-align:center;font-size:15px;font-weight:bold;text-shadow:0 2px 8px #000;z-index:2;pointer-events:none}
+#overlay{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:18px;background:#050609ed}
+.panel{width:100%;max-width:390px;text-align:center;padding:24px 18px;border:1px solid #555;border-radius:18px;background:#111219}
+h1{font-size:36px;letter-spacing:4px;margin:0;color:#d5d5d5}
+p{color:#b8b8c0;line-height:1.6;font-size:14px}
+#start{width:100%;padding:15px;font-size:18px;background:#30333d;margin-top:8px}
+.hidden{display:none!important}
+@media(min-width:500px){.control{width:70px;height:70px;font-size:28px}}
+</style>
+</head>
+<body>
+<div id="game">
+<canvas id="canvas"></canvas>
+<div id="hud">
+<div class="info">❤️ Can: <span id="health">3</span></div>
+<div class="info">🔑 <span id="keyStatus">Anahtar yok</span></div>
+<button id="flash">🔦 AÇIK</button>
+<button id="pause">Ⅱ</button>
+</div>
+<div id="message">Anahtarı bul ve çıkışa ulaş.</div>
+<div id="controls">
+<div class="group">
+<button class="control" id="left">◀</button>
+<button class="control" id="right">▶</button>
+</div>
+<div class="group">
+<button class="control" id="up">▲</button>
+<button class="control" id="down">▼</button>
+<button class="control" id="run">🏃</button>
+</div>
+</div>
+<div id="overlay">
+<div class="panel">
+<h1 id="title">KARANLIK</h1>
+<p id="description">Terk edilmiş evde uyandın.<br>Kapı kilitli. Anahtarı bul.<br>Evde yalnız değilsin...<br><br>🔦 Fenerini kullan.<br>👣 Yaratıktan uzak dur.<br>🔑 Anahtarı bul ve kaç!</p>
+<button id="start">EVİ KEŞFET</button>
+<p>ÇINAR GAMES • 2D KORKU</p>
+</div>
+</div>
+</div>
+<script>
+"use strict";
+const canvas=document.getElementById("canvas"),ctx=canvas.getContext("2d");
+const $=id=>document.getElementById(id);
+let W=0,H=0,dpr=1;
+function resize(){const r=canvas.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+window.addEventListener("resize",resize);resize();
+
+const T=48;
+const map=[
+"########################",
+"#..........#...........#",
+"#..........#...........#",
+"#......................#",
+"#....##...........##...#",
+"#....##...........##...#",
+"#......................#",
+"#####....#####.........#",
+"#......................#",
+"#.............#........#",
+"#.............#........#",
+"#......................#",
+"#....##................#",
+"#....##.......#####....#",
+"#......................#",
+"#......................#",
+"#.........#............#",
+"#.........#............#",
+"#......................#",
+"########################"];
+const mw=map[0].length,mh=map.length;
+let player,monster,key,door;
+let running=false,paused=false,won=false,lost=false,hasKey=false,flashlight=true;
+let health=3,clock=0,damageWait=0,notice=0,last=0,audio=null;
+const input={left:false,right:false,up:false,down:false,run:false};
+function sound(freq=400,duration=.12,type="sine"){
+ try{if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();if(audio.state==="suspended")audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.07,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+duration)}catch(e){}
+}
+function say(s,secs=3){$("message").textContent=s;notice=secs}
+function reset(){
+ player={x:T*2.5,y:T*2.5,r:11,angle:0};
+ monster={x:T*20.5,y:T*16.5,r:13};
+ key={x:T*18.5,y:T*2.5,got:false};
+ door={x:T*21.5,y:T*18.5};
+ health=3;hasKey=false;clock=0;damageWait=0;won=false;lost=false;paused=false;flashlight=true;running=true;
+ Object.keys(input).forEach(k=>input[k]=false);
+ $("health").textContent=health;$("keyStatus").textContent="Anahtar yok";$("flash").textContent="🔦 AÇIK";$("pause").textContent="Ⅱ";
+ say("Anahtarı bul. Çıkışa ulaş.",4);
+}
+function wall(x,y){let c=Math.floor(x/T),r=Math.floor(y/T);return r<0||r>=mh||c<0||c>=mw||map[r][c]==="#"}
+function canMove(x,y,r){return !wall(x-r,y-r)&&!wall(x+r,y-r)&&!wall(x-r,y+r)&&!wall(x+r,y+r)}
+function move(e,dx,dy,r){if(canMove(e.x+dx,e.y,r))e.x+=dx;if(canMove(e.x,e.y+dy,r))e.y+=dy}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function update(dt){
+ if(!running||paused||won||lost)return;
+ clock+=dt;damageWait=Math.max(0,damageWait-dt);notice=Math.max(0,notice-dt);
+ if(notice<=0)$("message").textContent="";
+ let dx=(input.right?1:0)-(input.left?1:0),dy=(input.down?1:0)-(input.up?1:0);
+ let len=Math.hypot(dx,dy);
+ if(len){dx/=len;dy/=len;player.angle=Math.atan2(dy,dx);let s=input.run?165:105;move(player,dx*s*dt,dy*s*dt,player.r)}
+ if(!key.got&&dist(player,key)<27){key.got=true;hasKey=true;$("keyStatus").textContent="Bulundu!";say("🔑 Anahtar sende! Çıkış kapısını bul.",4);sound(750,.2)}
+ let d=dist(player,monster);
+ if(d<410){
+  let s=monster.speed||45;
+  move(monster,(player.x-monster.x)/Math.max(d,1)*s*dt,(player.y-monster.y)/Math.max(d,1)*s*dt,monster.r);
+ }
+ if(d<27&&damageWait<=0){
+  health--;damageWait=1.5;$("health").textContent=health;sound(100,.35,"sawtooth");
+  if(health<=0){lost=true;end(false)}else say("Yaratık sana yaklaştı! Kaç!",2);
+ }
+ if(dist(player,door)<30){
+  if(hasKey){won=true;end(true)}else say("Kapı kilitli. Anahtarı bul!",2);
+ }
+}
+function end(success){
+ running=false;Object.keys(input).forEach(k=>input[k]=false);
+ $("title").textContent=success?"KURTULDUN!":"YAKALANDIN";
+ $("description").innerHTML=success?"Terk edilmiş evden kaçmayı başardın!<br>Cesaret puanı: "+Math.floor(clock*10)+"<br><br>Tekrar oynayıp daha hızlı kaçabilirsin.":"Yaratık seni yakaladı...<br>Bu evden kaçmak kolay değil.<br>Tekrar dene!";
+ $("start").textContent="TEKRAR OYNA";$("overlay").classList.remove("hidden");
+ sound(success?850:90,.35,success?"sine":"sawtooth");
+}
+function drawMap(){
+ const ox=W/2-player.x,oy=H/2-player.y;
+ ctx.fillStyle="#07080b";ctx.fillRect(0,0,W,H);
+ const x0=Math.floor((player.x-W/2)/T)-1,y0=Math.floor((player.y-H/2)/T)-1;
+ const x1=Math.ceil((player.x+W/2)/T)+1,y1=Math.ceil((player.y+H/2)/T)+1;
+ for(let y=Math.max(0,y0);y<Math.min(mh,y1);y++){
+  for(let x=Math.max(0,x0);x<Math.min(mw,x1);x++){
+   const px=x*T+ox,py=y*T+oy;
+   if(map[y][x]==="#"){
+    ctx.fillStyle="#25262a";ctx.fillRect(px,py,T,T);
+    ctx.strokeStyle="#45464a";ctx.strokeRect(px+2,py+2,T-4,T-4);
+   }else{
+    ctx.fillStyle=((x+y)%2===0)?"#121318":"#101116";ctx.fillRect(px,py,T,T);
+   }
+  }
+ }
+}
+function drawKey(ox,oy){
+ if(key.got)return;
+ const x=key.x+ox,y=key.y+oy;
+ ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(clock*3)*.2);
+ ctx.strokeStyle="#ffe45c";ctx.lineWidth=5;ctx.beginPath();ctx.arc(-4,0,8,0,Math.PI*2);ctx.stroke();
+ ctx.fillStyle="#ffe45c";ctx.fillRect(3,-3,17,6);ctx.fillRect(14,0,4,8);
+ ctx.restore();
+}
+function drawDoor(ox,oy){
+ const x=door.x+ox,y=door.y+oy;
+ ctx.fillStyle=hasKey?"#416b45":"#65382e";ctx.fillRect(x-17,y-23,34,46);
+ ctx.strokeStyle="#a5a5a5";ctx.strokeRect(x-17,y-23,34,46);
+ ctx.fillStyle="#ffe27a";ctx.beginPath();ctx.arc(x+9,y,3,0,Math.PI*2);ctx.fill();
+}
+function drawCharacter(e,color,ox,oy,isMonster=false){
+ const x=e.x+ox,y=e.y+oy;
+ ctx.save();ctx.translate(x,y);
+ if(isMonster){
+  ctx.fillStyle="#0b0b0d";ctx.beginPath();ctx.ellipse(0,2,15,19,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#f11";ctx.shadowColor="#f00";ctx.shadowBlur=13;
+  ctx.beginPath();ctx.arc(-5,-4,2.5,0,Math.PI*2);ctx.arc(5,-4,2.5,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;ctx.strokeStyle="#ddd";ctx.beginPath();ctx.moveTo(-5,5);ctx.lineTo(-2,9);ctx.lineTo(1,5);ctx.lineTo(4,9);ctx.stroke();
+ }else{
+  ctx.fillStyle="#171c26";ctx.beginPath();ctx.arc(0,-5,9,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=color;ctx.fillRect(-8,2,16,15);
+  ctx.strokeStyle="#9aa6b8";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,5);ctx.lineTo(Math.cos(e.angle)*15,5+Math.sin(e.angle)*15);ctx.stroke();
+ }
+ ctx.restore();
+}
+function draw(){
+ drawMap();
+ const ox=W/2-player.x,oy=H/2-player.y;
+ drawDoor(ox,oy);drawKey(ox,oy);
+ drawCharacter(monster,"#111",ox,oy,true);
+ drawCharacter(player,"#aab7cc",ox,oy,false);
+ // Fenerin ışık alanı
+ ctx.save();
+ ctx.globalCompositeOperation="source-over";
+ const px=W/2,py=H/2;
+ const radius=flashlight?Math.min(W,H)*.42:68;
+ const g=ctx.createRadialGradient(px,py,20,px,py,radius);
+ g.addColorStop(0,"#00000000");g.addColorStop(.65,"#00000055");g.addColorStop(1,"#000000f5");
+ ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ if(flashlight){
+  const a=player.angle;
+  ctx.globalCompositeOperation="destination-out";
+  ctx.beginPath();ctx.moveTo(px,py);
+  ctx.arc(px,py,Math.min(W,H)*.48,a-.52,a+.52);
+  ctx.closePath();ctx.fill();
+  ctx.globalCompositeOperation="source-over";
+  const cone=ctx.createRadialGradient(px,py,10,px,py,Math.min(W,H)*.48);
+  cone.addColorStop(0,"#ffffff09");cone.addColorStop(1,"#ffffff00");
+  ctx.fillStyle=cone;ctx.fillRect(0,0,W,H);
+ }
+ ctx.restore();
+ // Tehlike yaklaştığında ekran kızarır
+ const d=dist(player,monster);
+ if(d<150){
+  ctx.fillStyle="rgba(180,0,0,"+((150-d)/150*.22)+")";
+  ctx.fillRect(0,0,W,H);
+ }
+ if(paused&&running){
+  ctx.fillStyle="#000a";ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="white";ctx.font="bold 30px Arial";ctx.textAlign="center";ctx.fillText("DURAKLATILDI",W/2,H/2);
+ }
+}
+function loop(now){
+ const dt=Math.min((now-last)/1000||0,.04);last=now;
+ update(dt);draw();requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+$("start").addEventListener("click",()=>{
+ try{if(audio&&audio.state==="suspended")audio.resume()}catch(e){}
+ reset();$("overlay").classList.add("hidden");sound(500,.15);
+});
+$("flash").addEventListener("click",()=>{
+ flashlight=!flashlight;$("flash").textContent=flashlight?"🔦 AÇIK":"🔦 KAPALI";sound(350,.08);
+});
+$("pause").addEventListener("click",()=>{
+ if(!running)return;paused=!paused;$("pause").textContent=paused?"▶":"Ⅱ";
+});
+
+function bind(id,k){
+ const b=$(id);
+ b.addEventListener("pointerdown",e=>{
+  e.preventDefault();input[k]=true;
+  try{b.setPointerCapture(e.pointerId)}catch(err){}
+ });
+ const release=e=>{if(e)e.preventDefault();input[k]=false};
+ b.addEventListener("pointerup",release);
+ b.addEventListener("pointercancel",release);
+ b.addEventListener("lostpointercapture",release);
+ b.addEventListener("contextmenu",e=>e.preventDefault());
+}
+bind("left","left");bind("right","right");bind("up","up");bind("down","down");bind("run","run");
+window.addEventListener("blur",()=>Object.keys(input).forEach(k=>input[k]=false));
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("selectstart",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{
+ const m={ArrowLeft:"left",a:"left",ArrowRight:"right",d:"right",ArrowUp:"up",w:"up",ArrowDown:"down",s:"down",Shift:"run"};
+ if(m[e.key]){input[m[e.key]]=true;e.preventDefault()}
+});
+document.addEventListener("keyup",e=>{
+ const m={ArrowLeft:"left",a:"left",ArrowRight:"right",d:"right",ArrowUp:"up",w:"up",ArrowDown:"down",s:"down",Shift:"run"};
+ if(m[e.key]){input[m[e.key]]=false;e.preventDefault()}
+});
+reset();running=false;
+</script>
+</body>
+</html>
